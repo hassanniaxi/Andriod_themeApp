@@ -12,21 +12,14 @@
 
     <fragment
         android:id="@+id/wallpaper"
-        android:name="com.example.myapplication.Wallpaper"
+        android:name="com.example.myapplication.wallpaper.Wallpaper"
         android:label="Profile">
     </fragment>
 
     <fragment
-        android:id="@+id/theme"
-        android:name="com.example.myapplication.Theme"
-        android:label="Profile">
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/profile"
-        android:name="com.example.myapplication.Profile"
-        android:label="Profile">
+        android:id="@+id/ringtone"
+        android:name="com.example.myapplication.Ringtone"
+        android:label="Ringtone">
 
     </fragment>
 

@@ -1,6 +1,8 @@
+// File: build.gradle.kts (App-level)
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services") // Apply the Google services plugin
 }
 
 android {
@@ -26,35 +28,42 @@ android {
             )
         }
     }
-    buildFeatures{
+
+    buildFeatures {
         viewBinding = true
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
 
 dependencies {
-
+    // AndroidX and Kotlin dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment)
-
-    implementation (libs.androidx.navigation.fragment.ktx)
-    implementation (libs.androidx.navigation.ui.ktx)
-    implementation (libs.material.v1120)
-
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
-    // For control over item selection of both touch and mouse driven selection
     implementation(libs.androidx.recyclerview.selection)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.google.firebase.database.ktx)
+
+    // Glide for image loading
+    implementation(libs.glide)
+    implementation(libs.androidx.ui.android)
+
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

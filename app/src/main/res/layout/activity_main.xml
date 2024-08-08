@@ -1,10 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/ringtoneSearchView"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search Ringtones"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="wrap"
+        app:layout_constraintWidth_min="0dp"
+        android:visibility="gone"
+        android:iconifiedByDefault="false"/>
 
     <TextView
         android:id="@+id/header_title"
@@ -15,7 +29,30 @@
         android:textColor="@color/white"
         android:textSize="23sp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ringtoneSearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginTop="17dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/baseline_search_24"
+        app:tint="@color/white"
+        android:backgroundTint="@color/black" />
+
+    <ImageButton
+        android:id="@+id/closeSearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginTop="17dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/baseline_close_24"
+        app:tint="@color/white"
+        android:backgroundTint="@color/black"
+        android:visibility="gone" />
 
     <fragment
         android:id="@+id/nav_host_fragment"
@@ -23,21 +60,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="55dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/nav_bottom"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/nav_bottom"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/navigation">
-
-    </fragment>
+        app:navGraph="@navigation/navigation" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_bottom"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:pointerIcon="zoom_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,6 +80,5 @@
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:itemIconSize="30sp"
-        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"/>
-
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator" />
 </androidx.constraintlayout.widget.ConstraintLayout>

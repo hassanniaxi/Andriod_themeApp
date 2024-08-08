@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="@string/home"  android:icon="@drawable/hom" android:id="@+id/home"/>
-    <item android:title="@string/theme" android:icon="@drawable/themeicon" android:id="@+id/theme"/>
+    <item android:title="@string/ringtone" android:id="@+id/ringtone" android:icon="@drawable/ringtone_icon" />
     <item android:title="@string/wallpaper" android:icon="@drawable/wallicon" android:id="@+id/wallpaper"/>
-    <item android:title="@string/profile" android:icon="@drawable/perso" android:id="@+id/profile"/>
 </menu>

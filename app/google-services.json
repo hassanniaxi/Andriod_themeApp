@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "433441819331",
+    "project_id": "andriodthemeapp",
+    "storage_bucket": "andriodthemeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433441819331:android:3bd3dbbb9c0309496b7076",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN2mEc110_6jpbfdC95YcQR1_xXAiG4C0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
