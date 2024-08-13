@@ -6,4 +6,8 @@
     <color name="gray">#8395a7</color>
     <color name="purple">#be2edd</color>
     <color name="yellow">#f9ca24</color>
+    <color name="playing_color">#7ed6df</color>
+
+    <color name="button">  #3867d6</color>
+
 </resources>

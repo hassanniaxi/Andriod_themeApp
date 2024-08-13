@@ -18,7 +18,9 @@
         app:layout_constraintWidth_default="wrap"
         app:layout_constraintWidth_min="0dp"
         android:visibility="gone"
-        android:iconifiedByDefault="false"/>
+        />
+
+
 
     <TextView
         android:id="@+id/header_title"

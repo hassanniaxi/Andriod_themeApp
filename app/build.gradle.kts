@@ -62,6 +62,9 @@ dependencies {
     // Glide for image loading
     implementation(libs.glide)
     implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.room.common)
+    implementation(libs.firebase.database.v2020)
+    implementation(libs.firebase.firestore.ktx)
 
     // Testing dependencies
     testImplementation(libs.junit)

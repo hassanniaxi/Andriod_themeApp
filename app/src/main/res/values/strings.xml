@@ -20,4 +20,8 @@
     <string name="ringtone">Ringtone</string>
     <string name="play_ringtone">Play ringtone</string>
     <string name="no_ringtones_found">No ringtones found</string>
+    <string name="previous">Previous</string>
+    <string name="apply_ringtone">Apply Ringtone</string>
+    <string name="back">back</string>
+    <string name="apply">Apply</string>
 </resources>
