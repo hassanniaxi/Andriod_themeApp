@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.1"
+cardviewVersion = "1.0.0"
 firebaseBom = "33.1.2"
 glide = "4.15.1"
 googleFirebaseDatabase = "20.2.0"
@@ -23,8 +24,10 @@ firebaseDatabase = "21.0.0"
 uiAndroid = "1.6.8"
 roomCommon = "2.6.1"
 firebaseFirestoreKtx = "25.0.0"
+swiperefreshlayout = "1.1.0"
 
 [libraries]
+androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardviewVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragment" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragment" }
@@ -51,6 +54,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

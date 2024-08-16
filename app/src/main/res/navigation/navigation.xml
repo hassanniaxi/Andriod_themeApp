@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/ringtone"
-        android:name="com.example.myapplication.Ringtone"
+        android:name="com.example.myapplication.ringtone.Ringtone"
         android:label="Ringtone">
 
     </fragment>

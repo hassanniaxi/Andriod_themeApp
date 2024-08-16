@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
     <application
@@ -16,7 +18,22 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".RingtoneDetailActivity"
+            android:name=".wallpaper.ApplyWallpaper"
+            android:exported="false" />
+        <activity
+            android:name=".wallpaper.WallpaperDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".wallpaper.DisplayWallpaperActivity"
+            android:exported="false" />
+        <activity
+            android:name=".wallpaper.CategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".wallpaper.WallpaperCategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ringtone.RingtoneDetailActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

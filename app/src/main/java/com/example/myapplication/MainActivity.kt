@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.ringtone.Ringtone
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -18,13 +19,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize binding before accessing it
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Initialize NavController
         navController = findNavController(R.id.nav_host_fragment)
 
-        // Set up navigation
+
+
+
+            // Set up navigation
         findViewById<BottomNavigationView>(R.id.nav_bottom).setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -39,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Accessing the search view and button after binding initialization
     fun getSearchView(): SearchView = binding.ringtoneSearchView
     fun getRingtoneSearchButton(): ImageButton = binding.ringtoneSearchButton
 

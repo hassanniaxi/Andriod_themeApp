@@ -24,4 +24,8 @@
     <string name="apply_ringtone">Apply Ringtone</string>
     <string name="back">back</string>
     <string name="apply">Apply</string>
+    <string name="set_on_wallpaper">Set on wallpaper</string>
+    <string name="home_screen">Home screen</string>
+    <string name="lock_screen">Lock screen</string>
+    <string name="home_and_lock_screens">Home and Lock screens</string>
 </resources>

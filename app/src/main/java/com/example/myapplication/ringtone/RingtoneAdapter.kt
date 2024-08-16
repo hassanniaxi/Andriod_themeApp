@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.ringtone
 
 import android.content.Context
 import android.content.Intent
@@ -10,13 +10,15 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.myapplication.R
 
 class RingtoneAdapter(
     private var ringtones: List<RingtoneItem>,
     private val context: Context
 ) : RecyclerView.Adapter<RingtoneAdapter.ViewHolder>(), Filterable {
 
-    private var ringtonesFiltered: List<RingtoneItem> = ringtones // Initially unfiltered
+    private var ringtonesFiltered: List<RingtoneItem> = ringtones
     private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -24,12 +26,6 @@ class RingtoneAdapter(
         val authorTextView: TextView = view.findViewById(R.id.ringtone_author)
         val playRingtone: View = view.findViewById(R.id.play_ring)
         val ringtoneIcon: ImageView = view.findViewById(R.id.ringtone_icon)
-
-        fun bind(ringtone: RingtoneItem) {
-            ringtoneIcon.setImageResource(ringtone.icon)
-            titleTextView.text = ringtone.title
-            authorTextView.text = "Author: ${ringtone.author}"
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -40,46 +36,53 @@ class RingtoneAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val ringtone = ringtonesFiltered[position]
-        holder.bind(ringtone)
+        holder.titleTextView.text = ringtone.title
+        holder.authorTextView.text = ringtone.author
+        Glide.with(context).load(ringtone.icon).into(holder.ringtoneIcon)
 
         holder.playRingtone.setOnClickListener {
-            currentlyPlayingPosition = position
-            openRingtoneDetailActivity(ringtone)
+            if (currentlyPlayingPosition != position) {
+                val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
+                    putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_TITLE, ringtone.title)
+                    putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_AUTHOR, ringtone.author)
+                    putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
+                    putParcelableArrayListExtra(
+                        RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
+                        ArrayList(ringtonesFiltered)
+                    )
+                }
+                context.startActivity(intent)
+            }
         }
     }
 
-    private fun openRingtoneDetailActivity(ringtone: RingtoneItem) {
-        val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
-            putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_TITLE, ringtone.title)
-            putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_AUTHOR, ringtone.author)
-            putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, currentlyPlayingPosition)
-            putParcelableArrayListExtra(RingtoneDetailActivity.EXTRA_RINGTONE_LIST, ArrayList(ringtonesFiltered)) // Pass ringtone list
-        }
-        context.startActivity(intent)
+    override fun getItemCount(): Int {
+        return ringtonesFiltered.size
     }
-
-    override fun getItemCount() = ringtonesFiltered.size
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filterPattern = constraint?.toString()?.lowercase()?.trim() ?: ""
-                ringtonesFiltered = if (filterPattern.isEmpty()) {
+                val query = constraint?.toString()?.lowercase() ?: ""
+                val filteredList = if (query.isEmpty()) {
                     ringtones
                 } else {
                     ringtones.filter {
-                        it.title.lowercase().contains(filterPattern)
+                        it.title.lowercase().contains(query) ||
+                                it.author.lowercase().contains(query)
                     }
                 }
-                return FilterResults().apply { values = ringtonesFiltered }
+
+                return FilterResults().apply {
+                    values = filteredList
+                }
             }
 
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                ringtonesFiltered = (results?.values as? List<RingtoneItem>) ?: emptyList()
+                ringtonesFiltered = results?.values as? List<RingtoneItem> ?: emptyList()
                 notifyDataSetChanged()
             }
         }
     }
-
 }
