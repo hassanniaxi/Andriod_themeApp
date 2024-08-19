@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".wallpaper.Wallpaper"
     android:background="@color/white"
+    android:orientation="horizontal"
     android:id="@+id/wallpaper">
+
+    <include
+        android:id="@+id/overlay_spinner_layout"
+        layout="@layout/overlay_spinner_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/textView3"
@@ -16,7 +24,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutt"/>
+        app:layout_constraintBottom_toTopOf="@id/to_apply_wallpaper"/>
 
     <ImageButton
         android:id="@+id/back_to_wallpapers"
@@ -32,41 +40,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:id="@+id/layoutt"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/to_apply_wallpaper"
+        android:layout_width="350dp"
+        android:layout_height="600dp"
+        android:layout_gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/apply__wallpaper_on"
+        app:layout_constraintEnd_toEndOf="@id/overlay_spinner_layout"
+        app:srcCompat="@drawable/wall_cover"
+        app:layout_constraintStart_toStartOf="@id/overlay_spinner_layout"/>
+
+    <Button
+        android:id="@+id/apply__wallpaper_on"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/button"
+        android:text="@string/apply"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="18dp"
-        android:gravity="center"
-        android:layout_marginTop="50dp"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageView
-            android:id="@+id/to_apply_wallpaper"
-            android:layout_width="350dp"
-            android:layout_height="600dp"
-            android:layout_marginBottom="300dp"
-            android:layout_gravity="center"
-            app:srcCompat="@android:drawable/presence_video_online"
-            app:layout_constraintRight_toRightOf="@id/layoutt"
-            app:layout_constraintLeft_toLeftOf="@id/layoutt"
-            app:layout_constraintBottom_toTopOf="@id/apply__wallpaper_on"/>
-
-        <Button
-            android:id="@+id/apply__wallpaper_on"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:background="@color/button"
-            android:text="@string/apply"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@id/layoutt"
-            app:layout_constraintStart_toStartOf="@id/layoutt"
-            app:layout_constraintTop_toBottomOf="@+id/to_apply_wallpaper" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/to_apply_wallpaper" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

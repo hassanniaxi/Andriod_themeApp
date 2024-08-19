@@ -32,7 +32,7 @@ class Wallpaper : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_wallpaper, container, false)
 
-        recyclerView = view.findViewById(R.id.recycler_view)
+        recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
         spinner = view.findViewById(R.id.spinner)

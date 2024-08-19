@@ -8,51 +8,113 @@
     android:id="@+id/ringtone"
     android:background="@color/white">
 
-
     <TextView
-        android:id="@+id/not_found_text_view"
+        android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@color/gray"
-        android:textStyle="normal"
-        android:text="@string/no_ringtones_found"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBaseline_toTopOf="parent"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/spinner"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:background="@color/black"
-        android:backgroundTint="@color/white"
-        android:backgroundTintMode="screen"
-        android:foregroundTint="@color/yellow"
-        android:indeterminateOnly="true"
-        android:indeterminateTint="#000000"
-        android:progressBackgroundTint="#C51B1B"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/ringtoneSearchView"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            app:iconifiedByDefault="false"
+            app:queryHint="Search Ringtones"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_default="wrap"
+            app:layout_constraintWidth_min="0dp"
+            android:visibility="gone"
+            />
+
+    <ImageButton
+        android:id="@+id/ringtoneSearchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginBottom="691dp"
+        android:backgroundTint="@color/black"
+        android:scaleType="fitCenter"
+        android:layout_margin="8dp"
+        android:src="@drawable/baseline_search_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/closeSearchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_marginTop="17dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:src="@drawable/baseline_close_24"
+            app:tint="@color/white"
+            android:backgroundTint="@color/black"
+            android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ringtone"
+        android:layout_margin="12dp"
+        android:textColor="@color/white"
+        android:textSize="23sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/not_found_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_ringtones_found"
+            android:textAlignment="center"
+            android:textColor="@color/gray"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            app:layout_constraintBaseline_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/spinner"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:backgroundTint="@color/white"
+            android:backgroundTintMode="screen"
+            android:foregroundTint="@color/yellow"
+            android:indeterminateOnly="true"
+            android:indeterminateTint="#000000"
+            android:progressBackgroundTint="#C51B1B"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout_ringtone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_width="385dp"
+        android:layout_height="685dp"
+        android:layout_margin="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ringtone_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingBottom="25dp"
             android:layout_weight="1"
+            android:paddingBottom="25dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

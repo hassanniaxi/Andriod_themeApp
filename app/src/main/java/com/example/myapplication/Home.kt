@@ -18,7 +18,6 @@ class Home : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Initialize Firestore
         db = FirebaseFirestore.getInstance()
     }
 
@@ -32,29 +31,6 @@ class Home : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the TextView and ImageView
-        testing = view.findViewById(R.id.testing)
-        userNameTextView = view.findViewById(R.id.firebasetest) // Make sure this ID matches your layout
-
-        // Example of accessing a document in a collection and updating the ImageView
-        db.collection("test").document("data").get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    val imageUrl = document.getString("music") // Assuming "image" is a URL
-                    if (!imageUrl.isNullOrEmpty()) {
-                        Glide.with(this)
-                            .load(imageUrl)
-                            .into(testing)
-                    } else {
-                        userNameTextView.text = "Image URL Not Found"
-                    }
-                } else {
-                    userNameTextView.text = "User Document Not Found"
-                }
-            }
-            .addOnFailureListener { exception ->
-                userNameTextView.text = "Error: ${exception.message}"
-            }
     }
 
     companion object {

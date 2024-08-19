@@ -38,7 +38,9 @@ class RingtoneAdapter(
         val ringtone = ringtonesFiltered[position]
         holder.titleTextView.text = ringtone.title
         holder.authorTextView.text = ringtone.author
-        Glide.with(context).load(ringtone.icon).into(holder.ringtoneIcon)
+        Glide.with(context)
+            .load(ringtone.icon) // Ensure you are using an appropriate size
+            .into(holder.ringtoneIcon)
 
         holder.playRingtone.setOnClickListener {
             if (currentlyPlayingPosition != position) {
@@ -48,7 +50,7 @@ class RingtoneAdapter(
                     putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
                     putParcelableArrayListExtra(
                         RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
-                        ArrayList(ringtonesFiltered)
+                        ArrayList(ringtonesFiltered) // Consider passing only minimal data
                     )
                 }
                 context.startActivity(intent)

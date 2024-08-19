@@ -1,7 +1,10 @@
 package com.example.myapplication.ringtone
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
@@ -9,22 +12,27 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityRingtoneDetailBinding
+import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
 
 class RingtoneDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRingtoneDetailBinding
-    private val items = arrayOf("Phone ringtone", "Alarm tone", "Notification tone")
-    private var checkedItem = -1
     private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var ringtoneList: List<RingtoneItem>
-
+    private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
     private val updateHandler = Handler()
     private val updateRunnable = object : Runnable {
         override fun run() {
@@ -41,6 +49,8 @@ class RingtoneDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRingtoneDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
+        binding.root.addView(bindingForLoading.root)
 
         intent?.let {
             val ringtoneTitle = it.getStringExtra(EXTRA_RINGTONE_TITLE)
@@ -88,7 +98,7 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
 
         binding.applyRingtoneOn.setOnClickListener {
-            showRingtoneDialog()
+            checkWriteSettingsPermission()
         }
 
         binding.playPauseRingtone.setOnClickListener {
@@ -107,6 +117,71 @@ class RingtoneDetailActivity : AppCompatActivity() {
 
         binding.nextRingtone.setOnClickListener {
             playNextRingtone()
+        }
+    }
+
+    private fun showRingtoneBottomDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.bottom_sheet_dialog_apply_ringtone)
+
+        val onPhone = dialog.findViewById<LinearLayout>(R.id.setOnPhone)
+        val onAlarm = dialog.findViewById<LinearLayout>(R.id.setOnAlarm)
+        val onNotification = dialog.findViewById<LinearLayout>(R.id.setOnNotification)
+        val cancelButton = dialog.findViewById<ImageView>(R.id.cancelButton)
+
+        onPhone.setOnClickListener {
+            showSpinner()
+            applyRingtone(RingtoneManager.TYPE_RINGTONE)
+            dialog.dismiss()
+        }
+
+        onNotification.setOnClickListener {
+            showSpinner()
+            applyRingtone(RingtoneManager.TYPE_NOTIFICATION)
+            dialog.dismiss()
+        }
+
+        onAlarm.setOnClickListener {
+            showSpinner()
+            applyRingtone(RingtoneManager.TYPE_ALARM)
+            dialog.dismiss()
+        }
+
+        cancelButton.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
+        dialog.window?.let {
+            it.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            it.attributes?.windowAnimations = R.style.DialogAnimation
+            it.setGravity(Gravity.BOTTOM)
+        }
+    }
+
+    private fun applyRingtone(type: Int) {
+        val ringtone = ringtoneList.getOrNull(currentlyPlayingPosition) ?: return
+        val ringtoneUri = "android.resource://${packageName}/${ringtone.resourceId}"
+
+        try {
+            val uri = Uri.parse(ringtoneUri)
+            RingtoneManager.setActualDefaultRingtoneUri(this, type, uri)
+            Toast.makeText(this, "Ringtone applied successfully!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error applying ringtone: ${e.message}")
+            Toast.makeText(this, "Failed to apply ringtone", Toast.LENGTH_SHORT).show()
+        }
+        hideSpinner()
+    }
+
+    private fun checkWriteSettingsPermission() {
+        if (!Settings.System.canWrite(this)) {
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
+        } else {
+            showRingtoneBottomDialog()
         }
     }
 
@@ -174,6 +249,17 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun showSpinner() {
+        bindingForLoading.spinner.visibility = View.VISIBLE
+        bindingForLoading.overlay.visibility = View.VISIBLE
+    }
+
+    private fun hideSpinner() {
+        bindingForLoading.spinner.visibility = View.GONE
+        bindingForLoading.overlay.visibility = View.GONE
+    }
+
+
     private fun playNextRingtone() {
         if (ringtoneList.isNotEmpty()) {
             currentlyPlayingPosition = (currentlyPlayingPosition + 1) % ringtoneList.size
@@ -182,57 +268,6 @@ class RingtoneDetailActivity : AppCompatActivity() {
                 playRingtone(it.resourceId)
                 updateUI()
             }
-        }
-    }
-
-    private fun showRingtoneDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Set Ringtone On")
-        builder.setSingleChoiceItems(items, checkedItem) { _, which ->
-            checkedItem = which
-        }
-
-        builder.setPositiveButton("Done") { _, _ ->
-            checkWriteSettingsPermission()
-        }
-
-        builder.setNegativeButton("Cancel") { dialogInterface: DialogInterface, _ ->
-            dialogInterface.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-    }
-
-    private fun applyRingtone() {
-        val ringtone = ringtoneList.getOrNull(currentlyPlayingPosition) ?: return
-        val ringtoneUri = "android.resource://${packageName}/${ringtone.resourceId}"
-
-        val ringtoneType = when (checkedItem) {
-            0 -> RingtoneManager.TYPE_RINGTONE
-            1 -> RingtoneManager.TYPE_ALARM
-            2 -> RingtoneManager.TYPE_NOTIFICATION
-            else -> return
-        }
-
-        try {
-            val uri = Uri.parse(ringtoneUri)
-            RingtoneManager.setActualDefaultRingtoneUri(this, ringtoneType, uri)
-            Toast.makeText(this, "Ringtone applied successfully!", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error applying ringtone: ${e.message}")
-            Toast.makeText(this, "Failed to apply ringtone", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun checkWriteSettingsPermission() {
-        if (!Settings.System.canWrite(this)) {
-            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
-            }
-            startActivity(intent)
-        } else {
-            applyRingtone()
         }
     }
 
@@ -249,5 +284,6 @@ class RingtoneDetailActivity : AppCompatActivity() {
         const val EXTRA_RINGTONE_AUTHOR = "extra_ringtone_author"
         const val EXTRA_PLAYING_POSITION = "extra_playing_position"
         const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
+        private const val REQUEST_CODE_WRITE_SETTINGS = 1234
     }
 }

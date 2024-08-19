@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.myapplication.MainActivity
 import com.example.myapplication.R
+import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 class Ringtone : Fragment() {
 
@@ -39,23 +41,22 @@ class Ringtone : Fragment() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 300 // Debounce delay for search input
+    private lateinit var binding: FragmentRingtoneBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_ringtone, container, false)
+        binding = FragmentRingtoneBinding.inflate(inflater, container, false)
+        val view = binding.root
 
-        recyclerView = view.findViewById(R.id.ringtone_recycler_view)
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout_ringtone)
-        notFoundTextView = view.findViewById(R.id.not_found_text_view)
-        spinner = view.findViewById(R.id.spinner)
-
-        // Access SearchView and ImageButton from MainActivity
-        (requireActivity() as MainActivity).apply {
-            searchView = getSearchView()
-            ringtoneSearchButton = getRingtoneSearchButton()
-        }
+        // Initialize views using binding
+        recyclerView = binding.ringtoneRecyclerView
+        swipeRefreshLayout = binding.swipeRefreshLayoutRingtone
+        notFoundTextView = binding.notFoundTextView
+        spinner = binding.spinner
+        searchView = binding.ringtoneSearchView
+        ringtoneSearchButton = binding.ringtoneSearchButton
 
         viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
@@ -64,19 +65,15 @@ class Ringtone : Fragment() {
             ringtoneList.addAll(ringtones)
             adapter.notifyDataSetChanged()
             hideSpinner()
-            if (ringtoneList.isEmpty()) {
-                notFoundTextView.visibility = View.VISIBLE
-            }
+            notFoundTextView.visibility = if (ringtoneList.isEmpty()) View.VISIBLE else View.GONE
         }
 
         // Change text color to white
-        val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
-        searchEditText?.apply {
+        searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
             setTextColor(Color.WHITE)
             setHintTextColor(Color.WHITE)
         }
 
-        // Change the color of the search and close icons
         searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)?.setColorFilter(Color.WHITE)
         searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.setColorFilter(Color.WHITE)
 
@@ -113,9 +110,10 @@ class Ringtone : Fragment() {
     }
 
     private fun loadRingtones() {
-        db = FirebaseFirestore.getInstance()
-        db.collection("ringtones").get()
-            .addOnSuccessListener { result ->
+        CoroutineScope(Dispatchers.IO).launch {
+            db = FirebaseFirestore.getInstance()
+            try {
+                val result = db.collection("ringtones").get().await()
                 val ringtones = mutableListOf<RingtoneItem>()
                 for (document in result) {
                     val title = document.getString("name") ?: "Unknown"
@@ -126,17 +124,21 @@ class Ringtone : Fragment() {
                         ringtones.add(RingtoneItem(title, resourceId, getRingtoneDuration(resourceId), author, icon))
                     }
                 }
-                viewModel.setRingtones(ringtones)
-                if (ringtones.isEmpty()) {
-                    notFoundTextView.visibility = View.VISIBLE
+                withContext(Dispatchers.Main) {
+                    viewModel.setRingtones(ringtones)
+                    hideSpinner()
+                    if (ringtones.isEmpty()) {
+                        notFoundTextView.visibility = View.VISIBLE
+                    }
                 }
-                hideSpinner() // Ensure spinner is hidden after success
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    hideSpinner()
+                    notFoundTextView.visibility = View.VISIBLE
+                    notFoundTextView.text = "Error: ${e.message}"
+                }
             }
-            .addOnFailureListener { exception ->
-                hideSpinner()
-                notFoundTextView.visibility = View.VISIBLE
-                notFoundTextView.text = "Error: ${exception.message}"
-            }
+        }
     }
 
     private fun showSpinner() {
@@ -175,7 +177,7 @@ class Ringtone : Fragment() {
         }
     }
 
-    fun collapseSearchView() {
+    private fun collapseSearchView() {
         searchView.animate().alpha(0f).setDuration(300).withEndAction {
             searchView.visibility = View.GONE
             searchView.clearFocus()
@@ -186,6 +188,7 @@ class Ringtone : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
+        // Release other resources if needed
     }
 
     private fun getRingtoneDuration(resourceId: String): Int {

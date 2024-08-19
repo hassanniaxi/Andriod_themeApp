@@ -13,21 +13,30 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.request.target.CustomTarget
+import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
 
 class ApplyWallpaper : AppCompatActivity() {
 
     private lateinit var binding: ActivityApplyWallpaperBinding
+    private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityApplyWallpaperBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
+// Add the overlay layout to the root of the main layout
+        binding.root.addView(bindingForLoading.root)
+
 
         intent?.let {
             val applyingWallpaper = it.getStringExtra(APPLY_WALLPAPER)
@@ -51,27 +60,40 @@ class ApplyWallpaper : AppCompatActivity() {
         }
     }
 
+    private fun showSpinner() {
+        bindingForLoading.spinner.visibility = View.VISIBLE
+        bindingForLoading.overlay.visibility = View.VISIBLE
+    }
+
+    private fun hideSpinner() {
+        bindingForLoading.spinner.visibility = View.GONE
+        bindingForLoading.overlay.visibility = View.GONE
+    }
+
     private fun showBottomDialog(imageUrl: String) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(com.example.myapplication.R.layout.bottom_sheet_dialog_apply_wallpaper)
 
-        val homeScreen = dialog.findViewById<TextView>(com.example.myapplication.R.id.setOnHomeScreen)
-        val lockScreen = dialog.findViewById<TextView>(com.example.myapplication.R.id.setOnLockScreen)
-        val homeAndLockScreens = dialog.findViewById<TextView>(com.example.myapplication.R.id.setOnHomeAndLockScreen)
+        val homeScreen = dialog.findViewById<LinearLayout>(com.example.myapplication.R.id.setOnHomeScreen)
+        val lockScreen = dialog.findViewById<LinearLayout>(com.example.myapplication.R.id.setOnLockScreen)
+        val homeAndLockScreens = dialog.findViewById<LinearLayout>(com.example.myapplication.R.id.setOnHomeAndLockScreen)
         val cancelButton = dialog.findViewById<ImageView>(com.example.myapplication.R.id.cancelButton)
 
         homeScreen.setOnClickListener {
+            showSpinner()
             applyWallpaper(imageUrl, 0)
             dialog.dismiss()
         }
 
         lockScreen.setOnClickListener {
+            showSpinner()
             applyWallpaper(imageUrl, 1)
             dialog.dismiss()
         }
 
         homeAndLockScreens.setOnClickListener {
+            showSpinner()
             applyWallpaper(imageUrl, 2)
             dialog.dismiss()
         }
@@ -106,6 +128,7 @@ class ApplyWallpaper : AppCompatActivity() {
                 } catch (e: Exception) {
                     Toast.makeText(this@ApplyWallpaper, "Failed to set wallpaper: ${e.message}", Toast.LENGTH_LONG).show()
                 }
+                hideSpinner()
             }
 
             override fun onLoadCleared(placeholder: Drawable?) {

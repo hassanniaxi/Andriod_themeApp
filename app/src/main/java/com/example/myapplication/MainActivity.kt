@@ -19,43 +19,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize binding before accessing it
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Initialize NavController
         navController = findNavController(R.id.nav_host_fragment)
 
+        // Set up navigation
+        binding.navBottom.setupWithNavController(navController)
 
 
-
-            // Set up navigation
-        findViewById<BottomNavigationView>(R.id.nav_bottom).setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            updateHeaderTitle(destination.id)
-            if (destination.id == R.id.ringtone) {
-                binding.ringtoneSearchButton.visibility = View.VISIBLE
-            } else {
-                binding.ringtoneSearchButton.visibility = View.GONE
-                // Ensure the search view is collapsed
-                (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? Ringtone)?.collapseSearchView()
-            }
-        }
-    }
-
-    // Accessing the search view and button after binding initialization
-    fun getSearchView(): SearchView = binding.ringtoneSearchView
-    fun getRingtoneSearchButton(): ImageButton = binding.ringtoneSearchButton
-
-    private fun updateHeaderTitle(destinationId: Int) {
-        val title = when (destinationId) {
-            R.id.home -> getString(R.string.fragment_home_title)
-            R.id.wallpaper -> getString(R.string.fragment_wallpaper_title)
-            R.id.ringtone -> getString(R.string.fragment_ringtone_title)
-            else -> getString(R.string.app_name)
-        }
-        binding.headerTitle.text = title
     }
 }

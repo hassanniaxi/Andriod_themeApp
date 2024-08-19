@@ -6,62 +6,11 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/ringtoneSearchView"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        app:iconifiedByDefault="false"
-        app:queryHint="Search Ringtones"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap"
-        app:layout_constraintWidth_min="0dp"
-        android:visibility="gone"
-        />
-
-
-
-    <TextView
-        android:id="@+id/header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/header_title"
-        android:layout_margin="12dp"
-        android:textColor="@color/white"
-        android:textSize="23sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageButton
-        android:id="@+id/ringtoneSearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_marginTop="17dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/baseline_search_24"
-        app:tint="@color/white"
-        android:backgroundTint="@color/black" />
-
-    <ImageButton
-        android:id="@+id/closeSearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_marginTop="17dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/baseline_close_24"
-        app:tint="@color/white"
-        android:backgroundTint="@color/black"
-        android:visibility="gone" />
-
     <fragment
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="55dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toTopOf="@id/nav_bottom"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="viewStart"
-            android:text="@string/set_on_wallpaper"
+            android:text="@string/set_on_ringtone"
             android:padding="8dp"
             android:textStyle="bold"
             android:layout_marginStart="12dp"
@@ -48,34 +48,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:id="@+id/setOnHomeScreen"
+        android:id="@+id/setOnPhone"
         android:padding="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="@string/home_screen"
-            android:layout_marginLeft="10dp"
-            android:textSize="16sp"/>
+            android:text="@string/phone"
+            android:layout_marginStart="10dp"
+            android:textSize="18sp"/>
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/setOnLockScreen"
+        android:id="@+id/setOnAlarm"
         android:padding="10dp">
 
 
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="@string/lock_screen"
+            android:text="@string/alarm"
             android:layout_marginStart="10dp"
-            android:textSize="16sp"/>
+            android:textSize="18sp"/>
 
     </LinearLayout>
 
@@ -86,17 +85,16 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"
-        android:id="@+id/setOnHomeAndLockScreen"
+        android:id="@+id/setOnNotification"
         android:paddingBottom="30dp">
 
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="@string/home_and_lock_screens"
-            android:layout_marginLeft="10dp"
-            android:textSize="16sp"/>
+            android:text="@string/notification"
+             android:layout_marginStart="10dp"
+            android:textSize="18sp"/>
 
     </LinearLayout>
 
