@@ -29,21 +29,22 @@ import com.example.myapplication.databinding.ActivityRingtoneDetailBinding
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 
 class RingtoneDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRingtoneDetailBinding
-    private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
-    private var mediaPlayer: MediaPlayer? = null
-    private lateinit var ringtoneList: List<RingtoneItem>
     private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
+    private var mediaPlayer: MediaPlayer? = null
+    private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
+    private lateinit var ringtoneList: List<RingtoneItem>
+
     private val updateHandler = Handler()
     private val updateRunnable = object : Runnable {
         override fun run() {
             mediaPlayer?.let {
-                val currentPosition = it.currentPosition
-                binding.completionLine.progress = currentPosition
-                binding.ringtonePlayDuration.text = formatDuration(currentPosition)
+                binding.completionLine.progress = it.currentPosition
+                binding.ringtonePlayDuration.text = formatDuration(it.currentPosition)
                 updateHandler.postDelayed(this, 100)
             }
         }
@@ -56,21 +57,50 @@ class RingtoneDetailActivity : AppCompatActivity() {
         bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
         binding.root.addView(bindingForLoading.root)
 
+        handleIntent()
+        setupListeners()
+
+        ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
+            playRingtone(it.resourceId)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mediaPlayer?.let { updateHandler.post(updateRunnable) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayback()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopPlayback()
+        updateHandler.removeCallbacks(updateRunnable)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_WRITE_SETTINGS && Settings.System.canWrite(this)) {
+            showRingtoneBottomDialog()
+        } else {
+            Toast.makeText(this, "Permission denied. Cannot set ringtone.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleIntent() {
         intent?.let {
-            val ringtoneTitle = it.getStringExtra(EXTRA_RINGTONE_TITLE)
-            val ringtoneAuthor = it.getStringExtra(EXTRA_RINGTONE_AUTHOR)
             currentlyPlayingPosition = it.getIntExtra(EXTRA_PLAYING_POSITION, RecyclerView.NO_POSITION)
             ringtoneList = it.getParcelableArrayListExtra(EXTRA_RINGTONE_LIST) ?: listOf()
 
-            if (currentlyPlayingPosition in ringtoneList.indices) {
-                val ringtone = ringtoneList[currentlyPlayingPosition]
+            ringtoneList.getOrNull(currentlyPlayingPosition)?.let { ringtone ->
                 binding.fullDurationTime.text = formatDuration(ringtone.duration)
-                binding.ringtoneTitleTextView.text = ringtoneTitle
-                binding.ringtoneAuthorTextView.text = ringtoneAuthor
-                Glide.with(this)
-                    .load(ringtone.icon)
-                    .into(binding.ringtoneIcon)
-            } else {
+                binding.ringtoneTitleTextView.text = it.getStringExtra(EXTRA_RINGTONE_TITLE)
+                binding.ringtoneAuthorTextView.text = it.getStringExtra(EXTRA_RINGTONE_AUTHOR)
+                Glide.with(this).load(ringtone.icon).into(binding.ringtoneIcon)
+            } ?: run {
                 Log.e(TAG, "Invalid playing position: $currentlyPlayingPosition")
                 finish()
             }
@@ -78,25 +108,6 @@ class RingtoneDetailActivity : AppCompatActivity() {
             Log.e(TAG, "No intent data available")
             finish()
         }
-
-        setupListeners()
-
-        if (currentlyPlayingPosition in ringtoneList.indices) {
-            playRingtone(ringtoneList[currentlyPlayingPosition].resourceId)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mediaPlayer?.let {
-            updateHandler.post(updateRunnable)
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        stopPlayback()
-        updateHandler.removeCallbacks(updateRunnable)
     }
 
     private fun setupListeners() {
@@ -110,13 +121,7 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
 
         binding.playPauseRingtone.setOnClickListener {
-            if (mediaPlayer?.isPlaying == true) {
-                pausePlayback()
-            } else {
-                ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
-                    resumePlayback()
-                }
-            }
+            if (mediaPlayer?.isPlaying == true) pausePlayback() else resumePlayback()
         }
 
         binding.previousRingtone.setOnClickListener {
@@ -129,9 +134,16 @@ class RingtoneDetailActivity : AppCompatActivity() {
     }
 
     private fun showRingtoneBottomDialog() {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.bottom_sheet_dialog_apply_ringtone)
+        val dialog = Dialog(this).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setContentView(R.layout.bottom_sheet_dialog_apply_ringtone)
+            window?.let {
+                it.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                it.attributes?.windowAnimations = R.style.DialogAnimation
+                it.setGravity(Gravity.BOTTOM)
+            }
+        }
 
         val onPhone = dialog.findViewById<LinearLayout>(R.id.setOnPhone)
         val onAlarm = dialog.findViewById<LinearLayout>(R.id.setOnAlarm)
@@ -156,65 +168,32 @@ class RingtoneDetailActivity : AppCompatActivity() {
         cancelButton.setOnClickListener { dialog.dismiss() }
 
         dialog.show()
-        dialog.window?.let {
-            it.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            it.attributes?.windowAnimations = R.style.DialogAnimation
-            it.setGravity(Gravity.BOTTOM)
-        }
     }
 
     private fun applyRingtone(type: Int) {
-        val ringtone = ringtoneList.getOrNull(currentlyPlayingPosition) ?: return
-        val ringtoneUri = "android.resource://${packageName}/${ringtone.resourceId}"
-        val uri = Uri.parse(ringtoneUri)
-        Log.d(TAG, "Applying ringtone with URI: $uri")
+        showSpinner()
+        ringtoneList.getOrNull(currentlyPlayingPosition)?.let { ringtone ->
+            val resourceUri = "android.resource://${packageName}/${ringtone.resourceId}"
+            val uri = Uri.parse(resourceUri)
 
-        try {
-            // Create a file and save the ringtone
-            val fileName = "${ringtone.title}.mp3"
-            val file = File(getExternalFilesDir(Environment.DIRECTORY_RINGTONES), fileName)
-
-            val outputStream = FileOutputStream(file)
-            val inputStream = contentResolver.openInputStream(uri) ?: return
-            inputStream.copyTo(outputStream)
-            outputStream.close()
-            inputStream.close()
-
-            // Insert the ringtone into media store
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DATA, file.absolutePath)
-                put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3")
-                put(MediaStore.MediaColumns.TITLE, ringtone.title)
-                put(MediaStore.Audio.Media.IS_RINGTONE, type == RingtoneManager.TYPE_RINGTONE)
-                put(MediaStore.Audio.Media.IS_NOTIFICATION, type == RingtoneManager.TYPE_NOTIFICATION)
-                put(MediaStore.Audio.Media.IS_ALARM, type == RingtoneManager.TYPE_ALARM)
-                put(MediaStore.Audio.Media.IS_MUSIC, false)
-            }
-
-            val resolver = contentResolver
-            val newUri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-            if (newUri != null) {
-                // Set the new URI as the default ringtone
-                RingtoneManager.setActualDefaultRingtoneUri(this, type, newUri)
+            try {
+                // Set the ringtone directly
+                RingtoneManager.setActualDefaultRingtoneUri(this, type, uri)
                 Toast.makeText(this, "Ringtone applied successfully!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Failed to insert ringtone into media store.", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error applying ringtone: ${e.message}", e)
+                Toast.makeText(this, "Failed to apply ringtone", Toast.LENGTH_SHORT).show()
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error applying ringtone: ${e.message}")
-            Toast.makeText(this, "Failed to apply ringtone", Toast.LENGTH_SHORT).show()
-        } finally {
             hideSpinner()
         }
     }
-
 
     private fun checkWriteSettingsPermission() {
         if (!Settings.System.canWrite(this)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
                 data = Uri.parse("package:$packageName")
+                // Add flags to start the activity
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
         } else {
@@ -231,11 +210,22 @@ class RingtoneDetailActivity : AppCompatActivity() {
         binding.playPauseRingtone.setImageResource(R.drawable.baseline_play_arrow_24)
     }
 
+    private fun pausePlayback() {
+        mediaPlayer?.pause()
+        binding.playPauseRingtone.setImageResource(R.drawable.baseline_play_arrow_24)
+    }
+
+    private fun resumePlayback() {
+        mediaPlayer?.start()
+        binding.playPauseRingtone.setImageResource(R.drawable.baseline_pause_24)
+        updateHandler.post(updateRunnable)
+    }
+
     private fun playRingtone(resourceId: String) {
         try {
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
-                setDataSource(this@RingtoneDetailActivity, Uri.parse(resourceId))
+                setDataSource(applicationContext, Uri.parse(resourceId))
                 prepare()
                 start()
                 binding.completionLine.max = duration
@@ -257,93 +247,40 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun pausePlayback() {
-        mediaPlayer?.pause()
-        binding.playPauseRingtone.setImageResource(R.drawable.baseline_play_arrow_24)
-        updateHandler.removeCallbacks(updateRunnable)
-    }
-
-    private fun resumePlayback() {
-        mediaPlayer?.start()
-        binding.playPauseRingtone.setImageResource(R.drawable.baseline_pause_24)
-        updateHandler.post(updateRunnable)
-    }
-
-    private fun formatDuration(milliseconds: Int): String {
-        val seconds = (milliseconds / 1000) % 60
-        val minutes = (milliseconds / (1000 * 60)) % 60
-        return String.format("%02d:%02d", minutes, seconds)
-    }
-
     private fun playPreviousRingtone() {
-        if (ringtoneList.isNotEmpty()) {
-            currentlyPlayingPosition = (currentlyPlayingPosition - 1 + ringtoneList.size) % ringtoneList.size
-            ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
-                binding.fullDurationTime.text = formatDuration(it.duration)
-                playRingtone(it.resourceId)
-                updateUI()
-            }
+        currentlyPlayingPosition = (currentlyPlayingPosition - 1).takeIf { it >= 0 } ?: ringtoneList.size - 1
+        ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
+            playRingtone(it.resourceId)
         }
-    }
-
-    private fun showSpinner() {
-        bindingForLoading.spinner.visibility = View.VISIBLE
-        bindingForLoading.overlay.visibility = View.VISIBLE
-    }
-
-    private fun hideSpinner() {
-        bindingForLoading.spinner.visibility = View.GONE
-        bindingForLoading.overlay.visibility = View.GONE
     }
 
     private fun playNextRingtone() {
-        if (ringtoneList.isNotEmpty()) {
-            currentlyPlayingPosition = (currentlyPlayingPosition + 1) % ringtoneList.size
-            ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
-                binding.fullDurationTime.text = formatDuration(it.duration)
-                playRingtone(it.resourceId)
-                updateUI()
-            }
+        currentlyPlayingPosition = (currentlyPlayingPosition + 1) % ringtoneList.size
+        ringtoneList.getOrNull(currentlyPlayingPosition)?.let {
+            playRingtone(it.resourceId)
         }
     }
 
-    private fun updateUI() {
-        ringtoneList.getOrNull(currentlyPlayingPosition)?.let { ringtone ->
-            binding.ringtoneTitleTextView.text = ringtone.title
-            binding.ringtoneAuthorTextView.text = ringtone.author
-            Glide.with(this)
-                .load(ringtone.icon)
-                .into(binding.ringtoneIcon)
-        }
+    private fun formatDuration(milliseconds: Int): String {
+        val minutes = (milliseconds / 1000) / 60
+        val seconds = (milliseconds / 1000) % 60
+        return String.format("%02d:%02d", minutes, seconds)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
-            if (Settings.System.canWrite(this)) {
-                showRingtoneBottomDialog()
-            } else {
-                Toast.makeText(this, "Permission denied. Cannot set ringtone.", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private fun showSpinner() {
+        bindingForLoading.root.visibility = View.VISIBLE
     }
 
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        resumePlayback()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        pausePlayback()
+    private fun hideSpinner() {
+        bindingForLoading.root.visibility = View.GONE
     }
 
     companion object {
         private const val TAG = "RingtoneDetailActivity"
+        private const val REQUEST_CODE_WRITE_SETTINGS = 200
+        const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
+        const val EXTRA_PLAYING_POSITION = "extra_playing_position"
         const val EXTRA_RINGTONE_TITLE = "extra_ringtone_title"
         const val EXTRA_RINGTONE_AUTHOR = "extra_ringtone_author"
-        const val EXTRA_PLAYING_POSITION = "extra_playing_position"
-        const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
-        private const val REQUEST_CODE_WRITE_SETTINGS = 1234
     }
 }
