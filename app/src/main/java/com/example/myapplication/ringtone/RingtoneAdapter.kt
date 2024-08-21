@@ -39,7 +39,7 @@ class RingtoneAdapter(
         holder.titleTextView.text = ringtone.title
         holder.authorTextView.text = ringtone.author
         Glide.with(context)
-            .load(ringtone.icon) // Ensure you are using an appropriate size
+            .load(ringtone.icon)
             .into(holder.ringtoneIcon)
 
         holder.playRingtone.setOnClickListener {

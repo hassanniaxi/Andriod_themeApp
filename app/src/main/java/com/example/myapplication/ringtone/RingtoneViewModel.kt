@@ -9,5 +9,5 @@ class RingtoneViewModel : ViewModel() {
 
     fun setRingtones(ringtoneList: List<RingtoneItem>) {
         _ringtones.value = ringtoneList
-}
+    }
 }

@@ -66,11 +66,18 @@ dependencies {
     implementation(libs.firebase.database.v2020)
     implementation(libs.firebase.firestore.ktx)
 
+    implementation (libs.okhttp3.okhttp)
+
+
     implementation (libs.androidx.cardview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.firebase.crashlytics.buildtools)
+
+    implementation (libs.gson)
 
     // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(kotlin("script-runtime"))
 }

@@ -17,11 +17,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.request.target.CustomTarget
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
+import kotlinx.coroutines.*
 
 class ApplyWallpaper : AppCompatActivity() {
 
@@ -81,19 +80,16 @@ class ApplyWallpaper : AppCompatActivity() {
         val cancelButton = dialog.findViewById<ImageView>(com.example.myapplication.R.id.cancelButton)
 
         homeScreen.setOnClickListener {
-            showSpinner()
             applyWallpaper(imageUrl, 0)
             dialog.dismiss()
         }
 
         lockScreen.setOnClickListener {
-            showSpinner()
             applyWallpaper(imageUrl, 1)
             dialog.dismiss()
         }
 
         homeAndLockScreens.setOnClickListener {
-            showSpinner()
             applyWallpaper(imageUrl, 2)
             dialog.dismiss()
         }
@@ -111,30 +107,44 @@ class ApplyWallpaper : AppCompatActivity() {
     }
 
     private fun applyWallpaper(imageUrl: String, selectedOption: Int) {
-        Glide.with(this).asBitmap().load(imageUrl).into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                val wallpaperManager = WallpaperManager.getInstance(this@ApplyWallpaper)
-                try {
-                    when (selectedOption) {
-                        0 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                        1 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
-                        2 -> {
-                            wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                            wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
-                        }
-                        else -> Toast.makeText(this@ApplyWallpaper, "No option selected", Toast.LENGTH_SHORT).show()
-                    }
-                    Toast.makeText(this@ApplyWallpaper, "Wallpaper set successfully", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    Toast.makeText(this@ApplyWallpaper, "Failed to set wallpaper: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-                hideSpinner()
-            }
+        showSpinner()
 
-            override fun onLoadCleared(placeholder: Drawable?) {
-                // Handle placeholder if needed, or leave empty
-            }
-        })
+        Glide.with(this)
+            .asBitmap()
+            .load(imageUrl)
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val wallpaperManager = WallpaperManager.getInstance(this@ApplyWallpaper)
+                        try {
+                            when (selectedOption) {
+                                0 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
+                                1 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
+                                2 -> {
+                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
+                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
+                                }
+                                else -> withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@ApplyWallpaper, "No option selected", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(this@ApplyWallpaper, "Wallpaper set successfully", Toast.LENGTH_SHORT).show()
+                                hideSpinner() // Ensure this is on the main thread
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(this@ApplyWallpaper, "Failed to set wallpaper: ${e.message}", Toast.LENGTH_LONG).show()
+                                hideSpinner() // Ensure this is on the main thread
+                            }
+                        }
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+                    // Handle placeholder if needed
+                }
+            })
     }
 
     companion object {
