@@ -124,6 +124,7 @@
         android:id="@+id/filters"
         android:layout_width="wrap_content"
         android:layout_marginTop="10dp"
+        android:padding="3dp"
         android:layout_marginStart="15dp"
         android:layout_height="0dp"
         android:background="@drawable/filters_background"
@@ -135,40 +136,44 @@
             android:id="@+id/all_filter"
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
+            android:padding="5dp"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:background="@color/yellow"
             android:text="All" />
 
         <TextView
             android:id="@+id/ringtone_filter"
             android:layout_margin="5dp"
+            android:padding="5dp"
             android:background="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:text="@string/ringtone" />
 
         <TextView
             android:id="@+id/notification_filter"
             android:layout_margin="5dp"
+            android:padding="5dp"
             android:background="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:text="@string/notification" />
 
         <TextView
             android:id="@+id/alarm_filter"
             android:layout_margin="5dp"
+            android:padding="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
             android:background="@color/blue"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:text="@string/alarm" />
     </LinearLayout>
 

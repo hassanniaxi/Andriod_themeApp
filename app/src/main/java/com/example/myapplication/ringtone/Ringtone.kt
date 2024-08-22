@@ -40,7 +40,6 @@ class Ringtone : Fragment() {
     private lateinit var spinner: ProgressBar
     private lateinit var ringtoneSearchButton: ImageButton
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var gestureDetector: GestureDetector
     private val ringtoneList = mutableListOf<RingtoneItem>()
     private lateinit var db: FirebaseFirestore
     private lateinit var viewModel: RingtoneViewModel
@@ -117,52 +116,14 @@ class Ringtone : Fragment() {
 
         categeryFilters()
 
-        gestureDetector = GestureDetector(
-            requireContext(),
-            object : GestureDetector.SimpleOnGestureListener() {
-                override fun onDown(e: MotionEvent): Boolean = true
-
-                override fun onFling(
-                    e1: MotionEvent?, e2: MotionEvent, velocityX: Float,
-                    velocityY: Float
-                ): Boolean {
-                    val SWIPE_MIN_DISTANCE = 120
-                    val SWIPE_MAX_OFF_PATH = 250
-                    val SWIPE_THRESHOLD_VELOCITY = 200
-                    try {
-                        if (e1 == null) return false
-                        if (abs(e1.y - e2.y) > SWIPE_MAX_OFF_PATH) return false
-                        if (isGestureEnabled) {
-                            if (e1.x - e2.x > SWIPE_MIN_DISTANCE
-                                && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
-                            ) {
-                                findNavController().navigate(R.id.wallpaper) // Swipe Left to navigate back to Home
-                            } else if (e2.x - e1.x > SWIPE_MIN_DISTANCE
-                                && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
-                            ) {
-                                findNavController().navigate(R.id.home) // Swipe Right
-                            }
-                        }
-                    } catch (e: Exception) {
-                        // Handle exception
-                    }
-                    return super.onFling(e1, e2, velocityX, velocityY)
-                }
-            })
-
-        view.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
-
         return view
-    }
-
-    fun setGestureEnabled(enabled: Boolean) {
-        isGestureEnabled = enabled
     }
 
     private fun categeryFilters() {
         binding.allFilter.setOnClickListener {
             clearFilterBackgrounds()
             binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.allFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             currentFilter = null
             viewModel.ringtones.value?.let {
                 ringtoneList.clear()
@@ -175,6 +136,7 @@ class Ringtone : Fragment() {
         binding.ringtoneFilter.setOnClickListener {
             clearFilterBackgrounds()
             binding.ringtoneFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.ringtoneFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             currentFilter = "ringtone"
             filterRingtones("ringtone")  // Filter by ringtone category
         }
@@ -182,6 +144,7 @@ class Ringtone : Fragment() {
         binding.notificationFilter.setOnClickListener {
             clearFilterBackgrounds()
             binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             currentFilter = "notification"
             filterRingtones("notification")  // Filter by notification category
         }
@@ -189,6 +152,7 @@ class Ringtone : Fragment() {
         binding.alarmFilter.setOnClickListener {
             clearFilterBackgrounds()
             binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.alarmFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             currentFilter = "alarm"
             filterRingtones("alarm")  // Filter by alarm category
         }
@@ -199,6 +163,10 @@ class Ringtone : Fragment() {
         binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
         binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
         binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.ringtoneFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.alarmFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.allFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
     }
 
     private fun filterRingtones(filter: String?) {
