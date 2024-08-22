@@ -1,11 +1,14 @@
 package com.example.myapplication.ringtone
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -30,8 +33,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
-class Ringtone : Fragment() {
+class Ringtone : Fragment(), GestureDetector.OnGestureListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RingtoneAdapter
@@ -43,14 +47,24 @@ class Ringtone : Fragment() {
     private val ringtoneList = mutableListOf<RingtoneItem>()
     private lateinit var db: FirebaseFirestore
     private lateinit var viewModel: RingtoneViewModel
+    private lateinit var gestureDetector: GestureDetector
+    var x1:Float = 0.0f
+    var x2:Float = 0.0f
+    var y1:Float = 0.0f
+    var y2:Float = 0.0f
 
-    private var currentFilter: String? = null
-    private var isGestureEnabled: Boolean = true
+    companion object{
+        const val MINI_DISTANCE = 150
+    }
+
+
+    private var currentFilter: Int? = 1
 
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 300 // Debounce delay for search input
     private lateinit var binding: FragmentRingtoneBinding
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,6 +79,7 @@ class Ringtone : Fragment() {
         spinner = binding.spinner
         searchView = binding.ringtoneSearchView
         ringtoneSearchButton = binding.ringtoneSearchButton
+        this.gestureDetector = GestureDetector(requireContext(), this)
 
         viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
@@ -114,47 +129,100 @@ class Ringtone : Fragment() {
             loadRingtones()
         }
 
+        view.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    x1 = event.x
+                    y1 = event.y
+                }
+                MotionEvent.ACTION_UP -> {
+                    x2 = event.x
+                    y2 = event.y
+                    val valueX: Float = x2 - x1
+                    if (abs(valueX) > MINI_DISTANCE) {
+                        if (x2 > x1) {
+                            applyGeneralFilter("swipe_left")
+                            Log.d("swipe?", "left swipe ")
+                        } else {
+                            Log.d("swipe?", "right swipe ")
+                            applyGeneralFilter("swipe_right")
+                        }
+                    }
+                }
+            }
+            true
+        }
+
         categeryFilters()
 
         return view
     }
-
     private fun categeryFilters() {
         binding.allFilter.setOnClickListener {
-            clearFilterBackgrounds()
-            binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.allFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            currentFilter = null
-            viewModel.ringtones.value?.let {
-                ringtoneList.clear()
-                ringtoneList.addAll(it)  // Display all ringtones
-                adapter.notifyDataSetChanged()
-            }
-            updateNotFoundMessage()
+            applyFilter(1)
         }
 
         binding.ringtoneFilter.setOnClickListener {
-            clearFilterBackgrounds()
-            binding.ringtoneFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.ringtoneFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            currentFilter = "ringtone"
-            filterRingtones("ringtone")  // Filter by ringtone category
+            applyFilter(2)
         }
 
         binding.notificationFilter.setOnClickListener {
-            clearFilterBackgrounds()
-            binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            currentFilter = "notification"
-            filterRingtones("notification")  // Filter by notification category
+            applyFilter(3)
         }
 
         binding.alarmFilter.setOnClickListener {
-            clearFilterBackgrounds()
-            binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.alarmFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            currentFilter = "alarm"
-            filterRingtones("alarm")  // Filter by alarm category
+            applyFilter(4)
+        }
+    }
+
+    private fun applyFilter(filter: Int) {
+        clearFilterBackgrounds()
+        when (filter) {
+            1 -> {
+                binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                binding.allFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                currentFilter = 1
+                filterRingtones(1)
+            }
+            2 -> {
+                binding.ringtoneFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                binding.ringtoneFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                currentFilter = 2
+                filterRingtones(2)
+            }
+            3 -> {
+                binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                currentFilter = 3
+                filterRingtones(3)
+            }
+            4 -> {
+                binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                binding.alarmFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                currentFilter = 4
+                filterRingtones(4)
+            }
+        }
+    }
+    private fun applyGeneralFilter(action: String) {
+        when (action) {
+            "swipe_right" -> {
+                if (currentFilter == 4) {
+                    Log.d("swipe?", "don't move end")
+                } else {
+                    val newFilter = (currentFilter ?: 1) + 1
+                    applyFilter(newFilter.coerceAtMost(4)) // Ensure the filter value does not exceed 4
+                }
+            }
+            "swipe_left" -> {
+                if (currentFilter == 1) {
+                    Log.d("swipe?", "don't move start")
+                } else {
+                    val newFilter = (currentFilter ?: 1) - 1
+                    applyFilter(newFilter.coerceAtLeast(1)) // Ensure the filter value does not go below 1
+                }
+            }
         }
     }
 
@@ -169,12 +237,21 @@ class Ringtone : Fragment() {
         binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
     }
 
-    private fun filterRingtones(filter: String?) {
+
+    private fun filterRingtones(filter: Int?) {
+        val categoryFilter = when (filter) {
+            1 -> null
+            2 -> "ringtone"
+            3 -> "notification"
+            4 -> "alarm"
+            else -> null
+        }
+
         viewModel.ringtones.value?.let { ringtones ->
-            val filteredList = if (filter.isNullOrEmpty()) {
-                ringtones // No filter applied, show all
+            val filteredList = if (categoryFilter.isNullOrEmpty()) {
+                ringtones // No filter applied, show all ringtones
             } else {
-                ringtones.filter { it.category.equals(filter, ignoreCase = true) }
+                ringtones.filter { it.category.equals(categoryFilter, ignoreCase = true) }
             }
             ringtoneList.clear()
             ringtoneList.addAll(filteredList)
@@ -182,6 +259,7 @@ class Ringtone : Fragment() {
             updateNotFoundMessage(filteredList.isEmpty())
         }
     }
+
 
     private fun loadRingtones() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -202,7 +280,7 @@ class Ringtone : Fragment() {
                 withContext(Dispatchers.Main) {
                     viewModel.setRingtones(ringtones)
                     hideSpinner()
-                    filterRingtones(currentFilter) // Apply the current filter
+                    filterRingtones(currentFilter)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -282,5 +360,28 @@ class Ringtone : Fragment() {
         } catch (e: Exception) {
             0
         }
+    }
+
+
+    override fun onDown(p0: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onShowPress(p0: MotionEvent) {
+    }
+
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+        return false
+    }
+
+    override fun onLongPress(p0: MotionEvent) {
+    }
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+        return false
     }
 }
