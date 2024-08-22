@@ -3,24 +3,22 @@ package com.example.myapplication.ringtone
 import android.os.Parcel
 import android.os.Parcelable
 
-data class RingtoneItem(
+class RingtoneItem(
     val title: String,
-    val resourceId: String, // Use music URL instead of resource ID
+    val resourceId: String,
     val duration: Int,
     val author: String,
-    val icon: String // Use image URL instead of icon resource ID
+    val category: String,
+    val icon: String
 ) : Parcelable {
-
     constructor(parcel: Parcel) : this(
-        title = parcel.readString() ?: "",
-        resourceId  = parcel.readString() ?: "",
-        duration = parcel.readInt(),
-        author = parcel.readString() ?: "",
-        icon = parcel.readString() ?: ""
-    )
-
-    override fun describeContents(): Int {
-        return 0
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readString() ?: ""
+    ) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -28,7 +26,12 @@ data class RingtoneItem(
         parcel.writeString(resourceId)
         parcel.writeInt(duration)
         parcel.writeString(author)
+        parcel.writeString(category)
         parcel.writeString(icon)
+    }
+
+    override fun describeContents(): Int {
+        return 0
     }
 
     companion object CREATOR : Parcelable.Creator<RingtoneItem> {

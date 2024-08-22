@@ -94,15 +94,11 @@ class RingtoneDetailActivity : AppCompatActivity() {
         intent?.let {
             currentlyPlayingPosition = it.getIntExtra(EXTRA_PLAYING_POSITION, RecyclerView.NO_POSITION)
             ringtoneList = it.getParcelableArrayListExtra(EXTRA_RINGTONE_LIST) ?: listOf()
-
             ringtoneList.getOrNull(currentlyPlayingPosition)?.let { ringtone ->
                 binding.fullDurationTime.text = formatDuration(ringtone.duration)
                 binding.ringtoneTitleTextView.text = it.getStringExtra(EXTRA_RINGTONE_TITLE)
                 binding.ringtoneAuthorTextView.text = it.getStringExtra(EXTRA_RINGTONE_AUTHOR)
                 Glide.with(this).load(ringtone.icon).into(binding.ringtoneIcon)
-            } ?: run {
-                Log.e(TAG, "Invalid playing position: $currentlyPlayingPosition")
-                finish()
             }
         } ?: run {
             Log.e(TAG, "No intent data available")

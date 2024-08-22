@@ -44,6 +44,7 @@ class RingtoneAdapter(
 
         holder.playRingtone.setOnClickListener {
             if (currentlyPlayingPosition != position) {
+
                 val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
                     putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_TITLE, ringtone.title)
                     putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_AUTHOR, ringtone.author)
@@ -57,6 +58,7 @@ class RingtoneAdapter(
             }
         }
     }
+
 
     override fun getItemCount(): Int {
         return ringtonesFiltered.size

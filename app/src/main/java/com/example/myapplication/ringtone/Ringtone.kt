@@ -6,7 +6,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -15,8 +17,10 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -25,6 +29,7 @@ import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
+import kotlin.math.abs
 
 class Ringtone : Fragment() {
 
@@ -35,9 +40,13 @@ class Ringtone : Fragment() {
     private lateinit var spinner: ProgressBar
     private lateinit var ringtoneSearchButton: ImageButton
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var gestureDetector: GestureDetector
     private val ringtoneList = mutableListOf<RingtoneItem>()
     private lateinit var db: FirebaseFirestore
     private lateinit var viewModel: RingtoneViewModel
+
+    private var currentFilter: String? = null
+    private var isGestureEnabled: Boolean = true
 
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 300 // Debounce delay for search input
@@ -65,7 +74,7 @@ class Ringtone : Fragment() {
             ringtoneList.addAll(ringtones)
             adapter.notifyDataSetChanged()
             hideSpinner()
-            notFoundTextView.visibility = if (ringtoneList.isEmpty()) View.VISIBLE else View.GONE
+            updateNotFoundMessage(ringtoneList.isEmpty())
         }
 
         // Change text color to white
@@ -92,7 +101,7 @@ class Ringtone : Fragment() {
             }
         })
 
-        if (ringtoneList.isEmpty()) {
+        if (viewModel.ringtones.value.isNullOrEmpty()) {
             showSpinner()
             loadRingtones()
         }
@@ -106,7 +115,104 @@ class Ringtone : Fragment() {
             loadRingtones()
         }
 
+        categeryFilters()
+
+        gestureDetector = GestureDetector(
+            requireContext(),
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onDown(e: MotionEvent): Boolean = true
+
+                override fun onFling(
+                    e1: MotionEvent?, e2: MotionEvent, velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    val SWIPE_MIN_DISTANCE = 120
+                    val SWIPE_MAX_OFF_PATH = 250
+                    val SWIPE_THRESHOLD_VELOCITY = 200
+                    try {
+                        if (e1 == null) return false
+                        if (abs(e1.y - e2.y) > SWIPE_MAX_OFF_PATH) return false
+                        if (isGestureEnabled) {
+                            if (e1.x - e2.x > SWIPE_MIN_DISTANCE
+                                && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                            ) {
+                                findNavController().navigate(R.id.wallpaper) // Swipe Left to navigate back to Home
+                            } else if (e2.x - e1.x > SWIPE_MIN_DISTANCE
+                                && abs(velocityX) > SWIPE_THRESHOLD_VELOCITY
+                            ) {
+                                findNavController().navigate(R.id.home) // Swipe Right
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Handle exception
+                    }
+                    return super.onFling(e1, e2, velocityX, velocityY)
+                }
+            })
+
+        view.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
+
         return view
+    }
+
+    fun setGestureEnabled(enabled: Boolean) {
+        isGestureEnabled = enabled
+    }
+
+    private fun categeryFilters() {
+        binding.allFilter.setOnClickListener {
+            clearFilterBackgrounds()
+            binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            currentFilter = null
+            viewModel.ringtones.value?.let {
+                ringtoneList.clear()
+                ringtoneList.addAll(it)  // Display all ringtones
+                adapter.notifyDataSetChanged()
+            }
+            updateNotFoundMessage()
+        }
+
+        binding.ringtoneFilter.setOnClickListener {
+            clearFilterBackgrounds()
+            binding.ringtoneFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            currentFilter = "ringtone"
+            filterRingtones("ringtone")  // Filter by ringtone category
+        }
+
+        binding.notificationFilter.setOnClickListener {
+            clearFilterBackgrounds()
+            binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            currentFilter = "notification"
+            filterRingtones("notification")  // Filter by notification category
+        }
+
+        binding.alarmFilter.setOnClickListener {
+            clearFilterBackgrounds()
+            binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            currentFilter = "alarm"
+            filterRingtones("alarm")  // Filter by alarm category
+        }
+    }
+
+    private fun clearFilterBackgrounds() {
+        binding.ringtoneFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.notificationFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+    }
+
+    private fun filterRingtones(filter: String?) {
+        viewModel.ringtones.value?.let { ringtones ->
+            val filteredList = if (filter.isNullOrEmpty()) {
+                ringtones // No filter applied, show all
+            } else {
+                ringtones.filter { it.category.equals(filter, ignoreCase = true) }
+            }
+            ringtoneList.clear()
+            ringtoneList.addAll(filteredList)
+            adapter.notifyDataSetChanged()
+            updateNotFoundMessage(filteredList.isEmpty())
+        }
     }
 
     private fun loadRingtones() {
@@ -120,16 +226,15 @@ class Ringtone : Fragment() {
                     val resourceId = document.getString("musicUrl") ?: ""
                     val icon = document.getString("imageUrl") ?: "https://firebasestorage.googleapis.com/v0/b/andriodthemeapp.appspot.com/o/Ringtone_Database%2Ficons%2Fdefault_iconn.png?alt=media&token=c3f39156-382d-48c3-a3b8-a81c23ba4ef9"
                     val author = document.getString("artist") ?: "Unknown"
+                    val category = document.getString("category") ?: "Unknown"
                     if (resourceId.isNotEmpty()) {
-                        ringtones.add(RingtoneItem(title, resourceId, getRingtoneDuration(resourceId), author, icon))
+                        ringtones.add(RingtoneItem(title, resourceId, getRingtoneDuration(resourceId), author, category, icon))
                     }
                 }
                 withContext(Dispatchers.Main) {
                     viewModel.setRingtones(ringtones)
                     hideSpinner()
-                    if (ringtones.isEmpty()) {
-                        notFoundTextView.visibility = View.VISIBLE
-                    }
+                    filterRingtones(currentFilter) // Apply the current filter
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -158,8 +263,8 @@ class Ringtone : Fragment() {
         updateNotFoundMessage()
     }
 
-    private fun updateNotFoundMessage() {
-        notFoundTextView.visibility = if (adapter.itemCount == 0 && searchView.query.isNotEmpty()) {
+    private fun updateNotFoundMessage(isEmpty: Boolean = false) {
+        notFoundTextView.visibility = if (isEmpty && searchView.query.isEmpty()) {
             View.VISIBLE
         } else {
             View.GONE
@@ -177,7 +282,13 @@ class Ringtone : Fragment() {
         }
     }
 
+    private fun clearSearchField() {
+        searchView.setQuery("", false) // Clear the query and do not submit it
+    }
+
     private fun collapseSearchView() {
+        clearSearchField()
+        filterRingtones(currentFilter)
         searchView.animate().alpha(0f).setDuration(300).withEndAction {
             searchView.visibility = View.GONE
             searchView.clearFocus()

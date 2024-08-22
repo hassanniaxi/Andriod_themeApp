@@ -10,5 +10,6 @@
 
     <color name="button">  #3867d6</color>
     <color name="lavender">#8692f7</color>
+    <color name="defaultBackgroundColor">#0abde3</color>
 
 </resources>
