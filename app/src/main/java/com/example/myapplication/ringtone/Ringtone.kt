@@ -43,7 +43,6 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 class Ringtone : Fragment(), GestureDetector.OnGestureListener {
-/////hiii
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RingtoneAdapter
     private lateinit var notFoundTextView: TextView
@@ -145,8 +144,13 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         swipeRefreshLayout.setOnRefreshListener {
             loadRingtones()
         }
-
-
+        swipeRefreshLayout.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            if (event.action == MotionEvent.ACTION_UP) {
+                handleSwipeGesture(event)
+            }
+            true
+        }
         recyclerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_UP) {
@@ -232,7 +236,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         when (action) {
             "swipe_right" -> {
                 if (currentFilter == 4) {
-                    NavigationHandler.navigateToDestination(navController, R.id.wallpaper)
+//                    NavigationHandler.navigateToDestination(navController, R.id.wallpaper)
                 } else {
                     val newFilter = (currentFilter ?: 1) + 1
                     applyFilter(newFilter.coerceAtMost(4)) // Ensure the filter value does not exceed 4
@@ -240,7 +244,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
             "swipe_left" -> {
                 if (currentFilter == 1) {
-                    NavigationHandler.navigateToDestination(navController, R.id.home)
+//                    NavigationHandler.navigateToDestination(navController, R.id.home)
                 } else {
                     val newFilter = (currentFilter ?: 1) - 1
                     applyFilter(newFilter.coerceAtLeast(1)) // Ensure the filter value does not go below 1
