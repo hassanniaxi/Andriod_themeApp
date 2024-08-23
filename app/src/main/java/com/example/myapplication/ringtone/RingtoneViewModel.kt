@@ -15,4 +15,3 @@ class RingtoneViewModel : ViewModel() {
         return !_ringtones.value.isNullOrEmpty()
     }
 }
-//hi

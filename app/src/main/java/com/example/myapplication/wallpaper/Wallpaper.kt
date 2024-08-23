@@ -56,27 +56,6 @@ class Wallpaper : Fragment(),GestureDetector.OnGestureListener{
         navController = findNavController()
         this.gestureDetector = GestureDetector(requireContext(), this)
 
-        view.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            when (event?.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    x1 = event.x
-                    y1 = event.y
-                }
-                MotionEvent.ACTION_UP -> {
-                    x2 = event.x
-                    y2 = event.y
-                    val valueX: Float = x2 - x1
-                    if (abs(valueX) > Home.MINI_DISTANCE) {
-                        if (x2 > x1) {
-                            NavigationHandler.navigateToDestination(navController, R.id.ringtone)
-                        }
-                    }
-                }
-            }
-            true
-        }
-
         recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
 
@@ -95,6 +74,27 @@ class Wallpaper : Fragment(),GestureDetector.OnGestureListener{
             adapter.notifyDataSetChanged()
             hideSpinner()
             notFoundTextView.visibility = if (wallpaperList.isEmpty()) View.VISIBLE else View.GONE
+        }
+
+        recyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            when (event?.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    x1 = event.x
+                    y1 = event.y
+                }
+                MotionEvent.ACTION_UP -> {
+                    x2 = event.x
+                    y2 = event.y
+                    val valueX: Float = x2 - x1
+                    if (abs(valueX) > MINI_DISTANCE) {
+                        if (x2 > x1) {
+                            NavigationHandler.navigateToDestination(navController, R.id.ringtone)
+                        }
+                    }
+                }
+            }
+            true
         }
 
         swipeRefreshLayout.setOnRefreshListener {
