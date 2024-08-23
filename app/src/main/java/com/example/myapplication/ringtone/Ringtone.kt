@@ -57,12 +57,17 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         const val MINI_DISTANCE = 150
     }
 
-
     private var currentFilter: Int? = 1
 
     private val handler = Handler(Looper.getMainLooper())
-    private val debounceDelay: Long = 300 // Debounce delay for search input
+    private val debounceDelay: Long = 300
     private lateinit var binding: FragmentRingtoneBinding
+    private lateinit var recyclerViewGestureListener: RecyclerView.OnItemTouchListener
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -115,7 +120,15 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         })
 
-        if (viewModel.ringtones.value.isNullOrEmpty()) {
+
+//        if (!viewModel.isDataLoaded) {
+//            Log.d("chke", "hoi?")
+//            showSpinner()
+//            loadRingtones()
+//        }
+
+        if(viewModel.ringtones.value.isNullOrEmpty()){
+            Log.d("chke", "hoi222?")
             showSpinner()
             loadRingtones()
         }
@@ -129,35 +142,59 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             loadRingtones()
         }
 
-        view.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            when (event?.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    x1 = event.x
-                    y1 = event.y
-                }
-                MotionEvent.ACTION_UP -> {
-                    x2 = event.x
-                    y2 = event.y
-                    val valueX: Float = x2 - x1
-                    if (abs(valueX) > MINI_DISTANCE) {
-                        if (x2 > x1) {
-                            applyGeneralFilter("swipe_left")
-                            Log.d("swipe?", "left swipe ")
-                        } else {
-                            Log.d("swipe?", "right swipe ")
-                            applyGeneralFilter("swipe_right")
-                        }
+
+        // Create a custom OnItemTouchListener for RecyclerView
+        recyclerViewGestureListener = object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                val result = gestureDetector.onTouchEvent(e)
+                if (!result) {
+                    if (e.action == MotionEvent.ACTION_UP) {
+                        handleSwipeGesture(e)
                     }
                 }
+                return false
             }
-            true
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+
+
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        }
+
+        // Add the custom touch listener to RecyclerView
+        recyclerView.addOnItemTouchListener(recyclerViewGestureListener)
+
+        // Set touch listener for the whole fragment view
+        view.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                handleSwipeGesture(event)
+            }
+            false
         }
 
         categeryFilters()
 
         return view
     }
+    private fun handleSwipeGesture(event: MotionEvent) {
+        x2 = event.x
+        y2 = event.y
+        val valueX: Float = x2 - x1
+        if (abs(valueX) > MINI_DISTANCE) {
+            if (x2 > x1) {
+                applyGeneralFilter("swipe_left")
+                Log.d("swipe?", "left swipe ")
+            } else {
+                Log.d("swipe?", "right swipe ")
+                applyGeneralFilter("swipe_right")
+            }
+        }
+        // Reset touch start position
+        x1 = 0f
+        y1 = 0f
+    }
+
     private fun categeryFilters() {
         binding.allFilter.setOnClickListener {
             applyFilter(1)
@@ -260,7 +297,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         }
     }
 
-
     private fun loadRingtones() {
         CoroutineScope(Dispatchers.IO).launch {
             db = FirebaseFirestore.getInstance()
@@ -279,16 +315,15 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 }
                 withContext(Dispatchers.Main) {
                     viewModel.setRingtones(ringtones)
-                    hideSpinner()
                     filterRingtones(currentFilter)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    hideSpinner()
                     notFoundTextView.visibility = View.VISIBLE
                     notFoundTextView.text = "Error: ${e.message}"
                 }
             }
+            hideSpinner()
         }
     }
 
@@ -342,11 +377,14 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         ringtoneSearchButton.setImageResource(R.drawable.baseline_search_24)
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
-        // Release other resources if needed
+        recyclerView.removeOnItemTouchListener(recyclerViewGestureListener)
+//        viewModel.clearData() // Clear data if necessary
     }
+
 
     private fun getRingtoneDuration(resourceId: String): Int {
         return try {
@@ -363,7 +401,9 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     }
 
 
-    override fun onDown(p0: MotionEvent): Boolean {
+    override fun onDown(e: MotionEvent): Boolean {
+        x1 = e.x
+        y1 = e.y
         return false
     }
 

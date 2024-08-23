@@ -108,59 +108,63 @@
 
     <LinearLayout
         android:id="@+id/filters"
-        android:layout_width="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="3dp"
-        android:layout_marginStart="15dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:background="@drawable/filters_background"
         android:orientation="horizontal"
+        android:padding="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3">
 
         <TextView
             android:id="@+id/all_filter"
-            android:layout_margin="5dp"
             android:layout_width="wrap_content"
-            android:padding="5dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp"
+            android:layout_margin="5dp"
             android:background="@color/yellow"
-            android:text="All" />
+            android:padding="5dp"
+            android:text="@string/all"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ringtone_filter"
-            android:layout_margin="5dp"
-            android:padding="5dp"
-            android:background="@color/blue"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@color/blue"
+            android:padding="5dp"
+            android:text="@string/ringtone"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp"
-            android:text="@string/ringtone" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/notification_filter"
-            android:layout_margin="5dp"
-            android:padding="5dp"
-            android:background="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@color/blue"
+            android:padding="5dp"
+            android:text="@string/notification"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp"
-            android:text="@string/notification" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/alarm_filter"
-            android:layout_margin="5dp"
-            android:padding="5dp"
             android:layout_width="wrap_content"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textColor="?attr/colorOnSurface"
+            android:layout_margin="5dp"
             android:background="@color/blue"
-            android:textSize="18sp"
-            android:text="@string/alarm" />
+            android:padding="5dp"
+            android:text="@string/alarm"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp" />
     </LinearLayout>
 
 
