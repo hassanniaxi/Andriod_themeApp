@@ -22,12 +22,19 @@ import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI.setupWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
+import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
@@ -47,6 +54,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private val ringtoneList = mutableListOf<RingtoneItem>()
     private lateinit var db: FirebaseFirestore
     private lateinit var viewModel: RingtoneViewModel
+    private lateinit var navController: NavController
     private lateinit var gestureDetector: GestureDetector
     var x1:Float = 0.0f
     var x2:Float = 0.0f
@@ -62,11 +70,10 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 300
     private lateinit var binding: FragmentRingtoneBinding
-    private lateinit var recyclerViewGestureListener: RecyclerView.OnItemTouchListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
+        viewModel = ViewModelProvider(this, SavedStateViewModelFactory(requireActivity().application, this)).get(RingtoneViewModel::class.java)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -85,6 +92,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         searchView = binding.ringtoneSearchView
         ringtoneSearchButton = binding.ringtoneSearchButton
         this.gestureDetector = GestureDetector(requireContext(), this)
+        navController = findNavController()
 
         viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
@@ -120,17 +128,13 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         })
 
-
-//        if (!viewModel.isDataLoaded) {
-//            Log.d("chke", "hoi?")
-//            showSpinner()
-//            loadRingtones()
-//        }
-
-        if(viewModel.ringtones.value.isNullOrEmpty()){
-            Log.d("chke", "hoi222?")
+        // Replace the existing if statement with this:
+        if (!viewModel.hasLoadedRingtones()) {
             showSpinner()
             loadRingtones()
+        } else {
+            // If ringtones are already loaded, just apply the current filter
+            filterRingtones(currentFilter)
         }
 
         // Handle Search Button click
@@ -143,57 +147,39 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         }
 
 
-        // Create a custom OnItemTouchListener for RecyclerView
-        recyclerViewGestureListener = object : RecyclerView.OnItemTouchListener {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                val result = gestureDetector.onTouchEvent(e)
-                if (!result) {
-                    if (e.action == MotionEvent.ACTION_UP) {
-                        handleSwipeGesture(e)
-                    }
-                }
-                return false
-            }
-
-            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
-
-
-
-            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
-        }
-
-        // Add the custom touch listener to RecyclerView
-        recyclerView.addOnItemTouchListener(recyclerViewGestureListener)
-
-        // Set touch listener for the whole fragment view
-        view.setOnTouchListener { _, event ->
+        recyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_UP) {
                 handleSwipeGesture(event)
             }
-            false
+            true
         }
 
         categeryFilters()
 
         return view
     }
+
     private fun handleSwipeGesture(event: MotionEvent) {
+        if (x1 == 0f && y1 == 0f) return // Check initial values
+
         x2 = event.x
         y2 = event.y
-        val valueX: Float = x2 - x1
-        if (abs(valueX) > MINI_DISTANCE) {
-            if (x2 > x1) {
+        val deltaX = x2 - x1
+        val deltaY = y2 - y1
+        if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
+            if (deltaX > 0) {
                 applyGeneralFilter("swipe_left")
-                Log.d("swipe?", "left swipe ")
             } else {
-                Log.d("swipe?", "right swipe ")
                 applyGeneralFilter("swipe_right")
             }
         }
+
         // Reset touch start position
         x1 = 0f
         y1 = 0f
     }
+
 
     private fun categeryFilters() {
         binding.allFilter.setOnClickListener {
@@ -246,7 +232,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         when (action) {
             "swipe_right" -> {
                 if (currentFilter == 4) {
-                    Log.d("swipe?", "don't move end")
+                    NavigationHandler.navigateToDestination(navController, R.id.wallpaper)
                 } else {
                     val newFilter = (currentFilter ?: 1) + 1
                     applyFilter(newFilter.coerceAtMost(4)) // Ensure the filter value does not exceed 4
@@ -254,7 +240,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
             "swipe_left" -> {
                 if (currentFilter == 1) {
-                    Log.d("swipe?", "don't move start")
+                    NavigationHandler.navigateToDestination(navController, R.id.home)
                 } else {
                     val newFilter = (currentFilter ?: 1) - 1
                     applyFilter(newFilter.coerceAtLeast(1)) // Ensure the filter value does not go below 1
@@ -381,9 +367,8 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
-        recyclerView.removeOnItemTouchListener(recyclerViewGestureListener)
-//        viewModel.clearData() // Clear data if necessary
     }
+
 
 
     private fun getRingtoneDuration(resourceId: String): Int {

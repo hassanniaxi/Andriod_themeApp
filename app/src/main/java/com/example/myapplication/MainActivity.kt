@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.ringtone.NavigationHandler
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -28,5 +29,9 @@ class MainActivity : AppCompatActivity() {
         // Set up navigation
         binding.navBottom.setupWithNavController(navController)
 
+        binding.navBottom.setOnItemSelectedListener { item ->
+            NavigationHandler.navigateToDestination(navController, item.itemId)
+            true
+        }
     }
 }
