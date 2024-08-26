@@ -51,7 +51,7 @@ class RingtoneAdapter(
                     putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
                     putParcelableArrayListExtra(
                         RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
-                        ArrayList(ringtonesFiltered) // Consider passing only minimal data
+                        ArrayList(ringtonesFiltered)
                     )
                 }
                 context.startActivity(intent)

@@ -1,4 +1,5 @@
 package com.example.myapplication.ringtone
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,6 @@ class RingtoneViewModel : ViewModel() {
     }
 
     fun hasLoadedRingtones(): Boolean {
-        return !_ringtones.value.isNullOrEmpty()
+        return !(_ringtones.value.isNullOrEmpty())
     }
 }

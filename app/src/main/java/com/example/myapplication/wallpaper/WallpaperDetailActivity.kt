@@ -73,8 +73,7 @@ class WallpaperDetailActivity : AppCompatActivity() {
 
         // Start by showing the spinner
         showSpinner()
-
-        db.collection("wallpapers").document(title.lowercase()).collection("wallpapers")
+        db.collection("wallpapers").document(title.replace(" ", "").lowercase()).collection("detail")
             .get()
             .addOnSuccessListener { subResult ->
                 wallpaperDetailList.clear()

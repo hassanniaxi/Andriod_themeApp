@@ -90,7 +90,7 @@ class Wallpaper : Fragment(){
                 val wallpapers = mutableListOf<WallpaperItem>()
                 for (document in result) {
                     val title = document.getString("title") ?: "Unknown"
-                    val imageUrl = document.getString("imageUrl") ?: ""
+                    val imageUrl = document.getString("Cover") ?: ""
                     wallpapers.add(WallpaperItem(title, imageUrl))
                 }
                 viewModel.setWallpapers(wallpapers)

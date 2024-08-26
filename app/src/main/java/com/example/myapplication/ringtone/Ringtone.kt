@@ -22,25 +22,18 @@ import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI.setupWithNavController
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
-import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
-import kotlin.math.absoluteValue
 
 class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private lateinit var recyclerView: RecyclerView
@@ -55,12 +48,12 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private lateinit var viewModel: RingtoneViewModel
     private lateinit var navController: NavController
     private lateinit var gestureDetector: GestureDetector
-    var x1:Float = 0.0f
-    var x2:Float = 0.0f
-    var y1:Float = 0.0f
-    var y2:Float = 0.0f
+    private var x1: Float = 0.0f
+    private var x2: Float = 0.0f
+    private var y1: Float = 0.0f
+    private var y2: Float = 0.0f
 
-    companion object{
+    companion object {
         const val MINI_DISTANCE = 150
     }
 
@@ -72,7 +65,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, SavedStateViewModelFactory(requireActivity().application, this)).get(RingtoneViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -90,10 +83,8 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         spinner = binding.spinner
         searchView = binding.ringtoneSearchView
         ringtoneSearchButton = binding.ringtoneSearchButton
-        this.gestureDetector = GestureDetector(requireContext(), this)
+        gestureDetector = GestureDetector(requireContext(), this)
         navController = findNavController()
-
-        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
         viewModel.ringtones.observe(viewLifecycleOwner) { ringtones ->
             ringtoneList.clear()
@@ -127,13 +118,12 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         })
 
-        // Replace the existing if statement with this:
-        if (!viewModel.hasLoadedRingtones()) {
-            showSpinner()
-            loadRingtones()
-        } else {
+        if (viewModel.hasLoadedRingtones()) {
             // If ringtones are already loaded, just apply the current filter
             filterRingtones(currentFilter)
+        } else {
+            showSpinner()
+            loadRingtones()
         }
 
         // Handle Search Button click
@@ -144,6 +134,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         swipeRefreshLayout.setOnRefreshListener {
             loadRingtones()
         }
+
         swipeRefreshLayout.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_UP) {
@@ -151,6 +142,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
             true
         }
+
         recyclerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_UP) {
@@ -159,9 +151,15 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             true
         }
 
-        categeryFilters()
-
+        setupCategoryFilters()
         return view
+    }
+
+    private fun setupCategoryFilters() {
+        binding.allFilter.setOnClickListener { applyFilter(1) }
+        binding.ringtoneFilter.setOnClickListener { applyFilter(2) }
+        binding.notificationFilter.setOnClickListener { applyFilter(3) }
+        binding.alarmFilter.setOnClickListener { applyFilter(4) }
     }
 
     private fun handleSwipeGesture(event: MotionEvent) {
@@ -182,25 +180,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         // Reset touch start position
         x1 = 0f
         y1 = 0f
-    }
-
-
-    private fun categeryFilters() {
-        binding.allFilter.setOnClickListener {
-            applyFilter(1)
-        }
-
-        binding.ringtoneFilter.setOnClickListener {
-            applyFilter(2)
-        }
-
-        binding.notificationFilter.setOnClickListener {
-            applyFilter(3)
-        }
-
-        binding.alarmFilter.setOnClickListener {
-            applyFilter(4)
-        }
     }
 
     private fun applyFilter(filter: Int) {
@@ -232,11 +211,12 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         }
     }
+
     private fun applyGeneralFilter(action: String) {
         when (action) {
             "swipe_right" -> {
                 if (currentFilter == 4) {
-//                    NavigationHandler.navigateToDestination(navController, R.id.wallpaper)
+                    // NavigationHandler.navigateToDestination(navController, R.id.wallpaper)
                 } else {
                     val newFilter = (currentFilter ?: 1) + 1
                     applyFilter(newFilter.coerceAtMost(4)) // Ensure the filter value does not exceed 4
@@ -244,7 +224,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
             "swipe_left" -> {
                 if (currentFilter == 1) {
-//                    NavigationHandler.navigateToDestination(navController, R.id.home)
+                    // NavigationHandler.navigateToDestination(navController, R.id.home)
                 } else {
                     val newFilter = (currentFilter ?: 1) - 1
                     applyFilter(newFilter.coerceAtLeast(1)) // Ensure the filter value does not go below 1
@@ -259,11 +239,10 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         binding.alarmFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
         binding.allFilter.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
         binding.ringtoneFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.alarmFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
         binding.allFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-        binding.notificationFilter.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
     }
-
 
     private fun filterRingtones(filter: Int?) {
         val categoryFilter = when (filter) {
@@ -300,21 +279,41 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                     val author = document.getString("artist") ?: "Unknown"
                     val category = document.getString("category") ?: "Unknown"
                     if (resourceId.isNotEmpty()) {
-                        ringtones.add(RingtoneItem(title, resourceId, getRingtoneDuration(resourceId), author, category, icon))
+                        val duration = getRingtoneDuration(resourceId)
+                        ringtones.add(RingtoneItem(title, resourceId, duration, author, category, icon))
                     }
                 }
                 withContext(Dispatchers.Main) {
                     viewModel.setRingtones(ringtones)
                     filterRingtones(currentFilter)
+                    hideSpinner()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     notFoundTextView.visibility = View.VISIBLE
                     notFoundTextView.text = "Error: ${e.message}"
+                    hideSpinner()
                 }
             }
-            hideSpinner()
         }
+    }
+
+    private fun getRingtoneDuration(resourceId: String): Int {
+        return try {
+            val mediaPlayer = MediaPlayer().apply {
+                context?.let { setDataSource(it, Uri.parse(resourceId)) }
+                prepare()
+            }
+            val duration = mediaPlayer.duration
+            mediaPlayer.release()
+            duration
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    private fun updateNotFoundMessage(isEmpty: Boolean = false) {
+        notFoundTextView.visibility = if (isEmpty && searchView.query.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun showSpinner() {
@@ -332,14 +331,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private fun performSearch(query: String) {
         adapter.filter.filter(query)
         updateNotFoundMessage()
-    }
-
-    private fun updateNotFoundMessage(isEmpty: Boolean = false) {
-        notFoundTextView.visibility = if (isEmpty && searchView.query.isEmpty()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
     }
 
     private fun toggleSearchView() {
@@ -367,28 +358,10 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         ringtoneSearchButton.setImageResource(R.drawable.baseline_search_24)
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
     }
-
-
-
-    private fun getRingtoneDuration(resourceId: String): Int {
-        return try {
-            val mediaPlayer = MediaPlayer().apply {
-                context?.let { setDataSource(it, Uri.parse(resourceId)) }
-                prepare()
-            }
-            val duration = mediaPlayer.duration
-            mediaPlayer.release()
-            duration
-        } catch (e: Exception) {
-            0
-        }
-    }
-
 
     override fun onDown(e: MotionEvent): Boolean {
         x1 = e.x
@@ -396,21 +369,13 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         return false
     }
 
-    override fun onShowPress(p0: MotionEvent) {
-    }
+    override fun onShowPress(p0: MotionEvent) {}
 
-    override fun onSingleTapUp(p0: MotionEvent): Boolean {
-        return false
-    }
+    override fun onSingleTapUp(p0: MotionEvent): Boolean = false
 
-    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
-        return false
-    }
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = false
 
-    override fun onLongPress(p0: MotionEvent) {
-    }
+    override fun onLongPress(p0: MotionEvent) {}
 
-    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
-        return false
-    }
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = false
 }
