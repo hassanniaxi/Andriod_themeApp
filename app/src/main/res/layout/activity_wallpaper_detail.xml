@@ -5,28 +5,26 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".wallpaper.Wallpaper"
-    android:background="@color/white"
+    style="@style/backgrounds"
     android:id="@+id/wallpaper">
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="@color/black"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/back_to_wallpapers"
         android:contentDescription="@string/back"
-        android:layout_width="50dp"
+        style="@style/actions"
+        android:layout_width="@dimen/_55sdp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_marginBottom="7dp"
-        android:backgroundTint="@color/black"
+        android:layout_margin="@dimen/_5sdp"
         android:src="@drawable/baseline_arrow_back_24"
-        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -48,20 +46,14 @@
 
     <ProgressBar
         android:id="@+id/spinner"
-        style="?android:attr/progressBarStyle"
+        style="@style/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:backgroundTint="@color/white"
-        android:backgroundTintMode="screen"
-        android:foregroundTint="@color/yellow"
-        android:indeterminateOnly="true"
-        android:indeterminateTint="#000000"
-        android:progressBackgroundTint="#C51B1B"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

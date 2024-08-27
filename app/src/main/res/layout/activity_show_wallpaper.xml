@@ -2,19 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/show_wallpaper"
     android:layout_width="match_parent"
     style="@style/backgrounds"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".wallpaper.ShowWallpaper">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="34dp"
-        android:layout_height="44dp"
-        android:text="@string/hi"
-        style="@style/backgrounds"
-        android:textSize="50sp"
+    <ImageView
+        android:id="@+id/showWallpaper"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:paddingVertical="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

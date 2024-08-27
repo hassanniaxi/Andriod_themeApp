@@ -3,11 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    style="@style/backgrounds"
     android:background="@drawable/dialogbg">
 
     <ImageView
-        android:layout_width="90dp"
-        android:layout_height="5dp"
+        android:layout_width="@dimen/_70sdp"
+        android:layout_height="@dimen/_3sdp"
         android:src="@drawable/baseline_remove_24"
         android:layout_gravity="center|top"
         android:scaleType="centerCrop"
@@ -25,18 +26,18 @@
             android:layout_height="wrap_content"
             android:textAlignment="viewStart"
             android:text="@string/set_on_wallpaper"
-            android:padding="8dp"
+            android:padding="@dimen/_6sdp"
             android:textStyle="bold"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="5dp"
-            android:textSize="24dp" />
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:textSize="@dimen/_20ssp" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_26sdp"
             android:src="@drawable/baseline_close_24"
-            android:layout_marginStart="150dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="@dimen/_110sdp"
+            android:layout_marginTop="@dimen/_7sdp"
             android:textColor="@color/black"
             android:id="@+id/cancelButton"/>
 
@@ -47,17 +48,17 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/_8sdp"
         android:id="@+id/setOnHomeScreen"
-        android:padding="10dp">
+        android:padding="@dimen/_8sdp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:text="@string/home_screen"
-            android:layout_marginLeft="10dp"
-            android:textSize="16sp"/>
+            android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -65,17 +66,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/setOnLockScreen"
-        android:padding="10dp">
-
-
+        android:padding="@dimen/_8sdp">
         <TextView
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:text="@string/lock_screen"
-            android:layout_marginStart="10dp"
-            android:textSize="16sp"/>
+            android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
+                />
 
     </LinearLayout>
 
@@ -83,21 +83,18 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
         android:id="@+id/setOnHomeAndLockScreen"
-        android:paddingBottom="30dp">
-
+        android:paddingBottom="@dimen/_20sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:paddingRight="@dimen/_8sdp"
+        android:paddingLeft="@dimen/_8sdp">
         <TextView
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:text="@string/home_and_lock_screens"
-            android:layout_marginLeft="10dp"
-            android:textSize="16sp"/>
-
+            android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
     </LinearLayout>
 
 </LinearLayout>

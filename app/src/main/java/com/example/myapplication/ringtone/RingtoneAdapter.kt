@@ -16,25 +16,18 @@ import com.example.myapplication.R
 class RingtoneAdapter(
     private var ringtones: List<RingtoneItem>,
     private val context: Context
-) : RecyclerView.Adapter<RingtoneAdapter.ViewHolder>(), Filterable {
+) : RecyclerView.Adapter<RingtoneAdapter.MyHolder>(), Filterable {
 
     private var ringtonesFiltered: List<RingtoneItem> = ringtones
     private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleTextView: TextView = view.findViewById(R.id.ringtone_title)
-        val authorTextView: TextView = view.findViewById(R.id.ringtone_author)
-        val playRingtone: View = view.findViewById(R.id.play_ring)
-        val ringtoneIcon: ImageView = view.findViewById(R.id.ringtone_icon)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.ringtone_item, parent, false)
-        return ViewHolder(view)
+        return MyHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val ringtone = ringtonesFiltered[position]
         holder.titleTextView.text = ringtone.title
         holder.authorTextView.text = ringtone.author
@@ -44,6 +37,7 @@ class RingtoneAdapter(
 
         holder.playRingtone.setOnClickListener {
             if (currentlyPlayingPosition != position) {
+                currentlyPlayingPosition = position
 
                 val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
                     putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_TITLE, ringtone.title)
@@ -58,7 +52,6 @@ class RingtoneAdapter(
             }
         }
     }
-
 
     override fun getItemCount(): Int {
         return ringtonesFiltered.size
@@ -88,5 +81,12 @@ class RingtoneAdapter(
                 notifyDataSetChanged()
             }
         }
+    }
+
+   inner class MyHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val titleTextView: TextView = view.findViewById(R.id.ringtone_title)
+        val authorTextView: TextView = view.findViewById(R.id.ringtone_author)
+        val playRingtone: View = view.findViewById(R.id.play_ring)
+        val ringtoneIcon: ImageView = view.findViewById(R.id.ringtone_icon)
     }
 }

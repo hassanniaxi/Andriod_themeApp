@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".wallpaper.Wallpaper"
-    android:background="@color/white"
+    style="@style/backgrounds"
     android:orientation="horizontal"
     android:id="@+id/wallpaper">
 
@@ -19,49 +19,48 @@
     <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="@color/black"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/to_apply_wallpaper"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/back_to_wallpapers"
         android:contentDescription="@string/back"
-        android:layout_width="50dp"
+        style="@style/actions"
+        android:layout_width="@dimen/_55sdp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_marginBottom="7dp"
-        android:backgroundTint="@color/black"
+        android:layout_margin="@dimen/_5sdp"
         android:src="@drawable/baseline_arrow_back_24"
-        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/to_apply_wallpaper"
-        android:layout_width="350dp"
-        android:layout_height="600dp"
+        android:layout_width="270dp"
+        android:layout_height="430dp"
         android:layout_gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/apply__wallpaper_on"
-        app:layout_constraintEnd_toEndOf="@id/overlay_spinner_layout"
-        app:srcCompat="@drawable/wall_cover"
-        app:layout_constraintStart_toStartOf="@id/overlay_spinner_layout"/>
+        android:scaleType="centerCrop"
+        android:layout_marginTop="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/wall_cover" />
 
     <Button
         android:id="@+id/apply__wallpaper_on"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@color/button"
+        android:layout_width="340dp"
+        android:layout_height="45dp"
+        android:background="@drawable/rounded_button_background"
         android:text="@string/apply"
         android:textColor="@color/white"
-        android:textSize="15sp"
+        android:textSize="17sp"
         android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/to_apply_wallpaper" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

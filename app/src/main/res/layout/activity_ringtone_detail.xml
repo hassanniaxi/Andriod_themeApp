@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@color/white">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/backgrounds">
 
     <include
         android:id="@+id/overlay_spinner_layout_ringtone"
@@ -17,8 +17,8 @@
     <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="@color/black"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,33 +26,44 @@
     <ImageButton
         android:id="@+id/back_to_ringtones"
         android:contentDescription="@string/back"
-        android:layout_width="50dp"
+        style="@style/actions"
+        android:layout_width="@dimen/_55sdp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_marginBottom="7dp"
-        android:backgroundTint="@color/black"
+        android:layout_margin="@dimen/_5sdp"
         android:src="@drawable/baseline_arrow_back_24"
-        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/_190sdp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="90dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
+        android:layout_margin="@dimen/_50sdp"
+        app:cardCornerRadius="@dimen/_8sdp"
+        app:cardElevation="@dimen/_8sdp"
+        style="@style/cardShadow"
+        android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3">
 
-        <ImageView
-            android:id="@+id/ringtone_icon"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"/>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="@dimen/_4sdp">
+            <ImageView
+                android:id="@+id/ringtone_icon"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_200sdp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:src="@drawable/wall_cover"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.cardview.widget.CardView>
 
@@ -60,10 +71,11 @@
         android:id="@+id/ringtoneTitleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:textSize="24sp"
+        style="@style/texts"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:textSize="@dimen/_22ssp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:text="@string/author"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView" />
@@ -72,10 +84,10 @@
         android:id="@+id/ringtoneAuthorTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="@dimen/_1sdp"
         android:textColor="@color/gray"
-        android:textSize="12sp"
-        android:text="author"
+        android:textSize="@dimen/_10ssp"
+        android:text="@string/author"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ringtoneTitleTextView"
@@ -84,9 +96,9 @@
     <ProgressBar
         android:id="@+id/completion_line"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="350dp"
-        android:layout_marginTop="60dp"
-        android:layout_height="5dp"
+        android:layout_width="@dimen/_290sdp"
+        android:layout_marginTop="@dimen/_24sdp"
+        android:layout_height="@dimen/_5sdp"
         android:layout_gravity="center"
         android:progressDrawable="@drawable/custom_progress_bar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -98,14 +110,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/black"
-                android:background="@color/white"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginEnd="310dp"
+                android:textSize="@dimen/_8ssp"
+                style="@style/actions"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:layout_marginEnd="@dimen/_265sdp"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:text="00:00"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/completion_line"/>
 
@@ -114,13 +124,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="12sp"
-        android:textColor="@color/black"
-        android:background="@color/white"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginStart="313dp"
+        android:textSize="@dimen/_8ssp"
+        style="@style/actions"
+        android:text="00:00"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:layout_marginStart="@dimen/_265sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/completion_line"/>
@@ -129,65 +137,59 @@
         android:id="@+id/previous_ringtone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:layout_marginTop="3dp"
-        android:textColor="@color/gray"
+        style="@style/actions"
+        android:layout_marginTop="@dimen/_3sdp"
         android:contentDescription="@string/previous"
-        android:padding="7dp"
-        android:layout_marginVertical="30dp"
-        android:layout_marginEnd="170dp"
+        android:padding="@dimen/_7sdp"
+        android:layout_marginVertical="@dimen/_20sdp"
+        android:layout_marginEnd="@dimen/_120sdp"
         android:src="@drawable/baseline_skip_previous_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/completion_line"
-        app:tint="@color/black" />
+        app:layout_constraintTop_toBottomOf="@+id/completion_line" />
 
     <ImageButton
         android:id="@+id/play_pause_ringtone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:padding="7dp"
-        android:layout_marginTop="3dp"
+        style="@style/actions"
+        android:padding="@dimen/_7sdp"
+        android:layout_marginTop="@dimen/_3sdp"
         android:contentDescription="@string/previous"
-        android:layout_marginVertical="30dp"
+        android:layout_marginVertical="@dimen/_20sdp"
         android:src="@drawable/baseline_play_arrow_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/completion_line"
-        app:tint="@color/black" />
+        app:layout_constraintTop_toBottomOf="@+id/completion_line" />
 
     <ImageButton
         android:id="@+id/next_ringtone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:layout_marginTop="3dp"
-        android:textColor="@color/gray"
-        android:padding="7dp"
+        style="@style/actions"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:padding="@dimen/_7sdp"
         android:contentDescription="@string/previous"
-        android:layout_marginVertical="30dp"
-        android:layout_marginStart="170dp"
+        android:layout_marginVertical="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_120sdp"
         android:src="@drawable/baseline_skip_next_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/completion_line"
-        app:tint="@color/black" />
+         />
 
     <Button
         android:id="@+id/apply__ringtone_on"
-        android:layout_width="350dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="190dp"
+        android:layout_width="@dimen/_270sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:background="@drawable/rounded_button_background"
         android:text="@string/apply"
         android:textColor="@color/white"
-        android:background="@color/button"
-        android:textSize="15sp"
+        android:textSize="@dimen/_11ssp"
         android:textStyle="bold"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/completion_line"/>
+        app:layout_constraintTop_toBottomOf="@+id/play_pause_ringtone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

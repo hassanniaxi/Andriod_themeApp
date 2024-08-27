@@ -2,6 +2,7 @@ package com.example.myapplication.wallpaper
 
 import android.app.Dialog
 import android.app.WallpaperManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +54,13 @@ class ApplyWallpaper : AppCompatActivity() {
                 if (applyingWallpaper != null) {
                     showBottomDialog(applyingWallpaper)
                 }
+            }
+
+            binding.toApplyWallpaper.setOnClickListener{
+                val intent = Intent(this, ShowWallpaper::class.java).apply {
+                    putExtra( ShowWallpaper.SHOW_WALLPAPER, applyingWallpaper)
+                }
+                this.startActivity(intent)
             }
         } ?: run {
             finish()

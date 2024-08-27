@@ -17,6 +17,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
@@ -48,6 +50,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private lateinit var viewModel: RingtoneViewModel
     private lateinit var navController: NavController
     private lateinit var gestureDetector: GestureDetector
+    private lateinit var sortTextView: LinearLayout
     private var x1: Float = 0.0f
     private var x2: Float = 0.0f
     private var y1: Float = 0.0f
@@ -62,11 +65,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay: Long = 300
     private lateinit var binding: FragmentRingtoneBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -85,6 +83,9 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         ringtoneSearchButton = binding.ringtoneSearchButton
         gestureDetector = GestureDetector(requireContext(), this)
         navController = findNavController()
+        sortTextView  = binding.sort
+
+        viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
         viewModel.ringtones.observe(viewLifecycleOwner) { ringtones ->
             ringtoneList.clear()
@@ -94,14 +95,19 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             updateNotFoundMessage(ringtoneList.isEmpty())
         }
 
-        // Change text color to white
-        searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
-            setTextColor(Color.WHITE)
-            setHintTextColor(Color.WHITE)
-        }
 
-        searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)?.setColorFilter(Color.WHITE)
-        searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.setColorFilter(Color.WHITE)
+
+        val editText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        editText?.apply {
+            context.theme.obtainStyledAttributes(R.style.actions, intArrayOf(android.R.attr.textColor, android.R.attr.textColorHint)).apply {
+                try {
+                    setTextColor(getColor(0, Color.WHITE))
+                    setHintTextColor(getColor(0, Color.WHITE))
+                } finally {
+                    recycle()
+                }
+            }
+        }
 
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = RingtoneAdapter(ringtoneList, requireContext())
@@ -112,16 +118,36 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.visibility = View.GONE
                 handler.removeCallbacksAndMessages(null)
                 handler.postDelayed({ performSearch(newText.orEmpty()) }, debounceDelay)
                 return true
             }
         })
 
-        if (viewModel.hasLoadedRingtones()) {
-            // If ringtones are already loaded, just apply the current filter
-            filterRingtones(currentFilter)
-        } else {
+        sortTextView.setOnClickListener {
+            val popupMenu = PopupMenu(context, sortTextView)
+            popupMenu.menuInflater.inflate(R.menu.sort_menu, popupMenu.menu)
+
+            popupMenu.setOnMenuItemClickListener { item ->
+                val selectedOption = item.toString()
+                when (selectedOption) {
+                    "Alphabetical (A → Z)" -> {sortRingtones(ascending = true)
+                    binding.sortBy.setText("${selectedOption}") }
+
+                    "Alphabetical (Z → A)" -> {sortRingtones(ascending = false)
+                        binding.sortBy.setText("${selectedOption}") }
+                }
+                true
+            }
+
+            popupMenu.show()
+        }
+
+
+
+        if (ringtoneList.isEmpty()) {
+            Log.d("chk", "yes loading ringtones")
             showSpinner()
             loadRingtones()
         }
@@ -129,6 +155,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         // Handle Search Button click
         ringtoneSearchButton.setOnClickListener {
             toggleSearchView()
+
         }
 
         swipeRefreshLayout.setOnRefreshListener {
@@ -154,6 +181,15 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         setupCategoryFilters()
         return view
     }
+
+    private fun sortRingtones(ascending: Boolean) {
+        ringtoneList.sortWith { item1, item2 ->
+            val comparison = item1.title.compareTo(item2.title, ignoreCase = true)
+            if (ascending) comparison else -comparison
+        }
+        adapter.notifyDataSetChanged()
+    }
+
 
     private fun setupCategoryFilters() {
         binding.allFilter.setOnClickListener { applyFilter(1) }
@@ -210,6 +246,13 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 filterRingtones(4)
             }
         }
+        sortRingtonesRandomly()
+    }
+
+    private fun sortRingtonesRandomly() {
+        binding.sortBy.setText("Sort by")
+        ringtoneList.shuffle()
+        adapter.notifyDataSetChanged()
     }
 
     private fun applyGeneralFilter(action: String) {
@@ -334,6 +377,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     }
 
     private fun toggleSearchView() {
+
         if (searchView.visibility == View.VISIBLE) {
             collapseSearchView()
         } else {

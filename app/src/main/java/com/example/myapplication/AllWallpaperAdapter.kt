@@ -39,6 +39,5 @@ class AllWallpaperAdapter(
 
     inner class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val wallpaperImage: ImageView = itemView.findViewById(R.id.wall_cover)
-//        val wallpaperTitle: TextView = itemView.findViewById(R.id.wall_cover_title)
     }
 }

@@ -3,6 +3,8 @@ package com.example.myapplication
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -33,6 +35,7 @@ class Home : Fragment(){
     private lateinit var spinner: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var viewModel: AllWallpaperViewModel
+    private var recyclerViewState: Parcelable? = null
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -60,6 +63,11 @@ class Home : Fragment(){
             notFoundTextView.visibility = if (wallpaperList.isEmpty()) View.VISIBLE else View.GONE
         }
 
+        if (savedInstanceState != null) {
+            recyclerViewState = savedInstanceState.getParcelable("recyclerViewState")
+        }
+
+
         swipeRefreshLayout.setOnRefreshListener {
             loadWallpapers()
         }
@@ -71,6 +79,26 @@ class Home : Fragment(){
 
         return view
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (::recyclerView.isInitialized) {
+            outState.putParcelable("recyclerViewState", recyclerView.layoutManager?.onSaveInstanceState())
+        }
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            recyclerViewState = savedInstanceState.getParcelable("recyclerViewState")
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
+    }
+
 
     private fun showSpinner() {
         spinner.visibility = View.VISIBLE
@@ -85,7 +113,6 @@ class Home : Fragment(){
     }
 
     private fun loadWallpapers() {
-        showSpinner()
         db = FirebaseFirestore.getInstance()
 
         // Fetch wallpapers from the main collection

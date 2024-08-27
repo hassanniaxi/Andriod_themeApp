@@ -68,6 +68,9 @@ dependencies {
 
     implementation (libs.okhttp3.okhttp)
 
+    implementation (libs.ssp.android)
+    implementation (libs.sdp.android.v111)
+
 
     implementation (libs.androidx.cardview)
     implementation(libs.androidx.swiperefreshlayout)

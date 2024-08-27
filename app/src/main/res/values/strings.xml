@@ -34,4 +34,9 @@
     <string name="notification">Notification</string>
     <string name="phone">Phone</string>
     <string name="all">All</string>
+    <string name="author">author</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort by</string>
+    <string name="alphabetical_z_a">Alphabetical (Z → A)</string>
+    <string name="alphabetical_a_z">Alphabetical (A → Z)</string>
 </resources>
