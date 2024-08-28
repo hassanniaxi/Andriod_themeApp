@@ -39,28 +39,28 @@
 
     <ImageView
         android:id="@+id/to_apply_wallpaper"
-        android:layout_width="270dp"
-        android:layout_height="430dp"
+        android:layout_width="@dimen/_300sdp"
+        android:layout_height="@dimen/_500sdp"
         android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:layout_marginTop="70dp"
+        android:scaleType="centerInside"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
         app:srcCompat="@drawable/wall_cover" />
 
     <Button
         android:id="@+id/apply__wallpaper_on"
-        android:layout_width="340dp"
-        android:layout_height="45dp"
+        android:layout_width="@dimen/_300sdp"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:background="@drawable/rounded_button_background"
         android:text="@string/apply"
         android:textColor="@color/white"
-        android:textSize="17sp"
+        android:textSize="@dimen/_14ssp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

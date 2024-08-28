@@ -27,7 +27,7 @@
                 android:layout_width="37dp"
                 android:layout_height="@dimen/_32sdp"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/wall_cover" />
+                app:srcCompat="@drawable/default_iconn" />
 
         </androidx.cardview.widget.CardView>
 

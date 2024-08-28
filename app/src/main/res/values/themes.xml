@@ -38,8 +38,11 @@
     <item name="android:background">@color/white</item>
 </style>
 
+    <style name="cards">
+        <item name="android:background">@color/gray</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 
-    <!--   -->
     <style name="spinner">
         <item name="android:background">@color/white</item>
         <item name="android:indeterminateTint">@color/black</item>

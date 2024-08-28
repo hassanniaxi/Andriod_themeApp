@@ -1,16 +1,19 @@
 package com.example.myapplication.ringtone
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -125,37 +128,44 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         })
 
+        val defaultSortOption = "Name"
+        binding.sortBy.setText(defaultSortOption)
+
         sortTextView.setOnClickListener {
             val popupMenu = PopupMenu(context, sortTextView)
             popupMenu.menuInflater.inflate(R.menu.sort_menu, popupMenu.menu)
+            val sortByValue = binding.sortBy.text.toString()
 
-            popupMenu.setOnMenuItemClickListener { item ->
-                val selectedOption = item.toString()
-                when (selectedOption) {
-                    "Alphabetical (A → Z)" -> {sortRingtones(ascending = true)
-                    binding.sortBy.setText("${selectedOption}") }
-
-                    "Alphabetical (Z → A)" -> {sortRingtones(ascending = false)
-                        binding.sortBy.setText("${selectedOption}") }
-                }
-                true
+            val defaultItem = popupMenu.menu.findItemByTitle(sortByValue)
+            defaultItem?.let {
+                highlightMenuItem(it)
             }
 
+            popupMenu.setOnMenuItemClickListener { item ->
+                val selectedOption = item.title.toString()
+                binding.sortBy.text = selectedOption
+
+                when (selectedOption) {
+                    "Name" -> sortRingtones()
+                    "Artist" -> {
+                        sortByArtist()}
+                }
+                highlightMenuItem(item)
+                true
+            }
             popupMenu.show()
         }
 
-
-
-        if (ringtoneList.isEmpty()) {
-            Log.d("chk", "yes loading ringtones")
+            if (ringtoneList.isEmpty()) {
             showSpinner()
             loadRingtones()
-        }
+        }else{
+                filterRingtones(currentFilter)
+            }
 
         // Handle Search Button click
         ringtoneSearchButton.setOnClickListener {
             toggleSearchView()
-
         }
 
         swipeRefreshLayout.setOnRefreshListener {
@@ -181,8 +191,33 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         setupCategoryFilters()
         return view
     }
+    fun Menu.findItemByTitle(title: String): MenuItem? {
+        for (i in 0 until size()) {
+            val item = getItem(i)
+            if (item.title.toString() == title) {
+                return item
+            }
+        }
+        return null
+    }
+    @SuppressLint("ResourceAsColor")
+    private fun highlightMenuItem( item: MenuItem) {
+        val color = context?.let { ContextCompat.getColor(it, R.color.blue) }
+        val spanString = SpannableString(item.title)
+        spanString.setSpan(color?.let { ForegroundColorSpan(it) }, 0, spanString.length, 0)
+        item.title = spanString
+    }
 
-    private fun sortRingtones(ascending: Boolean) {
+    private fun sortByArtist(ascending: Boolean = true) {
+        ringtoneList.sortWith { item1, item2 ->
+            val comparison = item1.author.compareTo(item2.author, ignoreCase = true)
+            if (ascending) comparison else -comparison
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+
+    private fun sortRingtones(ascending: Boolean = true) {
         ringtoneList.sortWith { item1, item2 ->
             val comparison = item1.title.compareTo(item2.title, ignoreCase = true)
             if (ascending) comparison else -comparison
@@ -246,13 +281,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 filterRingtones(4)
             }
         }
-        sortRingtonesRandomly()
-    }
-
-    private fun sortRingtonesRandomly() {
-        binding.sortBy.setText("Sort by")
-        ringtoneList.shuffle()
-        adapter.notifyDataSetChanged()
     }
 
     private fun applyGeneralFilter(action: String) {
@@ -298,12 +326,19 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
 
         viewModel.ringtones.value?.let { ringtones ->
             val filteredList = if (categoryFilter.isNullOrEmpty()) {
-                ringtones // No filter applied, show all ringtones
+                ringtones
             } else {
                 ringtones.filter { it.category.equals(categoryFilter, ignoreCase = true) }
             }
             ringtoneList.clear()
             ringtoneList.addAll(filteredList)
+
+            // Apply the current sort option after filtering
+            when (binding.sortBy.text.toString()) {
+                "Name" -> sortRingtones()
+                "Artist" -> sortByArtist()
+            }
+
             adapter.notifyDataSetChanged()
             updateNotFoundMessage(filteredList.isEmpty())
         }
@@ -313,19 +348,18 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         CoroutineScope(Dispatchers.IO).launch {
             db = FirebaseFirestore.getInstance()
             try {
-                val result = db.collection("ringtones").get().await()
-                val ringtones = mutableListOf<RingtoneItem>()
-                for (document in result) {
-                    val title = document.getString("name") ?: "Unknown"
-                    val resourceId = document.getString("musicUrl") ?: ""
-                    val icon = document.getString("imageUrl") ?: "https://firebasestorage.googleapis.com/v0/b/andriodthemeapp.appspot.com/o/Ringtone_Database%2Ficons%2Fdefault_iconn.png?alt=media&token=c3f39156-382d-48c3-a3b8-a81c23ba4ef9"
+                val result = db.collection("ringtones")
+                    .limit(20) // Use pagination, load 20 ringtones at a time
+                    .get().await()
+
+                val ringtones = result.documents.mapNotNull { document ->
+                    val title = document.getString("name") ?: return@mapNotNull null
+                    val resourceId = document.getString("musicUrl") ?: return@mapNotNull null
                     val author = document.getString("artist") ?: "Unknown"
                     val category = document.getString("category") ?: "Unknown"
-                    if (resourceId.isNotEmpty()) {
-                        val duration = getRingtoneDuration(resourceId)
-                        ringtones.add(RingtoneItem(title, resourceId, duration, author, category, icon))
-                    }
+                    RingtoneItem(title, resourceId, author, category)
                 }
+
                 withContext(Dispatchers.Main) {
                     viewModel.setRingtones(ringtones)
                     filterRingtones(currentFilter)
@@ -341,19 +375,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         }
     }
 
-    private fun getRingtoneDuration(resourceId: String): Int {
-        return try {
-            val mediaPlayer = MediaPlayer().apply {
-                context?.let { setDataSource(it, Uri.parse(resourceId)) }
-                prepare()
-            }
-            val duration = mediaPlayer.duration
-            mediaPlayer.release()
-            duration
-        } catch (e: Exception) {
-            0
-        }
-    }
 
     private fun updateNotFoundMessage(isEmpty: Boolean = false) {
         notFoundTextView.visibility = if (isEmpty && searchView.query.isEmpty()) View.VISIBLE else View.GONE

@@ -61,7 +61,7 @@
                 android:layout_height="@dimen/_200sdp"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
-                android:src="@drawable/wall_cover"/>
+                android:src="@drawable/default_iconn"/>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 

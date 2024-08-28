@@ -55,13 +55,6 @@ class ApplyWallpaper : AppCompatActivity() {
                     showBottomDialog(applyingWallpaper)
                 }
             }
-
-            binding.toApplyWallpaper.setOnClickListener{
-                val intent = Intent(this, ShowWallpaper::class.java).apply {
-                    putExtra( ShowWallpaper.SHOW_WALLPAPER, applyingWallpaper)
-                }
-                this.startActivity(intent)
-            }
         } ?: run {
             finish()
         }

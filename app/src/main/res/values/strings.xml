@@ -39,4 +39,7 @@
     <string name="sort_by">Sort by</string>
     <string name="alphabetical_z_a">Alphabetical (Z → A)</string>
     <string name="alphabetical_a_z">Alphabetical (A → Z)</string>
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="artist">Artist</string>
 </resources>

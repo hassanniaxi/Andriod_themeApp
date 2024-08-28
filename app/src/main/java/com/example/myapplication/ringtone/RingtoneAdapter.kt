@@ -31,17 +31,12 @@ class RingtoneAdapter(
         val ringtone = ringtonesFiltered[position]
         holder.titleTextView.text = ringtone.title
         holder.authorTextView.text = ringtone.author
-        Glide.with(context)
-            .load(ringtone.icon)
-            .into(holder.ringtoneIcon)
 
         holder.playRingtone.setOnClickListener {
             if (currentlyPlayingPosition != position) {
                 currentlyPlayingPosition = position
 
                 val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
-                    putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_TITLE, ringtone.title)
-                    putExtra(RingtoneDetailActivity.EXTRA_RINGTONE_AUTHOR, ringtone.author)
                     putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
                     putParcelableArrayListExtra(
                         RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
