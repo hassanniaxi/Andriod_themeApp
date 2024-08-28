@@ -88,6 +88,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         navController = findNavController()
         sortTextView  = binding.sort
 
+
         viewModel = ViewModelProvider(this).get(RingtoneViewModel::class.java)
 
         viewModel.ringtones.observe(viewLifecycleOwner) { ringtones ->
@@ -242,9 +243,11 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                applyGeneralFilter("swipe_left")
+//                applyGeneralFilter("swipe_left")
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.home) }
             } else {
-                applyGeneralFilter("swipe_right")
+//                applyGeneralFilter("swipe_right")
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper) }
             }
         }
 

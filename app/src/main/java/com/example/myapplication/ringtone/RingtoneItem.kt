@@ -7,14 +7,12 @@ import java.util.Date
 class RingtoneItem(
     val title: String,
     val resourceId: String,
-//    val duration: Int,
     val author: String,
     val category: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-//        parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: ""
     )
@@ -22,7 +20,6 @@ class RingtoneItem(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(title)
         parcel.writeString(resourceId)
-//        parcel.writeInt(duration)
         parcel.writeString(author)
         parcel.writeString(category)
     }

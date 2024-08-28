@@ -21,11 +21,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
 import com.example.myapplication.ringtone.NavigationHandler
+import com.example.myapplication.ringtone.Ringtone
+import com.example.myapplication.ringtone.Ringtone.Companion
 import com.example.myapplication.wallpaper.WallpaperDetailItem
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.abs
 
-class Home : Fragment(){
+class Home : Fragment(), GestureDetector.OnGestureListener{
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AllWallpaperAdapter
@@ -36,6 +38,16 @@ class Home : Fragment(){
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var viewModel: AllWallpaperViewModel
     private var recyclerViewState: Parcelable? = null
+    private lateinit var gestureDetector: GestureDetector
+    private var x1: Float = 0.0f
+    private var x2: Float = 0.0f
+    private var y1: Float = 0.0f
+    private var y2: Float = 0.0f
+    private var navController: NavController? = null
+
+    companion object {
+        const val MINI_DISTANCE = 150
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
@@ -49,6 +61,8 @@ class Home : Fragment(){
         spinner = view.findViewById(R.id.spinner)
         notFoundTextView = view.findViewById(R.id.not_found_text_view2)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
+        navController = findNavController()
+        gestureDetector = GestureDetector(requireContext(), this)
 
         adapter = AllWallpaperAdapter(requireContext(), wallpaperList)
         recyclerView.adapter = adapter
@@ -77,7 +91,43 @@ class Home : Fragment(){
             loadWallpapers()
         }
 
+        swipeRefreshLayout.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            if (event.action == MotionEvent.ACTION_UP) {
+                handleSwipeGesture(event)
+            }
+            true
+        }
+
+        recyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            if (event.action == MotionEvent.ACTION_UP) {
+                handleSwipeGesture(event)
+            }
+            true
+        }
+
+
         return view
+    }
+
+    private fun handleSwipeGesture(event: MotionEvent) {
+        if (x1 == 0f && y1 == 0f) return // Check initial values
+
+        x2 = event.x
+        y2 = event.y
+        val deltaX = x2 - x1
+        val deltaY = y2 - y1
+        if (abs(deltaX) > Ringtone.MINI_DISTANCE && abs(deltaY) < Ringtone.MINI_DISTANCE) {
+            if (deltaX > 0) {
+
+            } else {
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtone) }
+            }
+        }
+
+        x1 = 0f
+        y1 = 0f
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -160,6 +210,20 @@ class Home : Fragment(){
             }
     }
 
+    override fun onDown(e: MotionEvent): Boolean {
+        x1 = e.x
+        y1 = e.y
+        return false
+    }
 
+    override fun onShowPress(p0: MotionEvent) {}
+
+    override fun onSingleTapUp(p0: MotionEvent): Boolean = false
+
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = false
+
+    override fun onLongPress(p0: MotionEvent) {}
+
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = false
 
 }
