@@ -1,10 +1,8 @@
-package com.example.myapplication
+package com.example.myapplication.all_wallpapers
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,14 +18,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
-import com.example.myapplication.ringtone.NavigationHandler
-import com.example.myapplication.ringtone.Ringtone
-import com.example.myapplication.ringtone.Ringtone.Companion
-import com.example.myapplication.wallpaper.WallpaperDetailItem
+import com.example.myapplication.NavigationHandler
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.abs
 
-class Home : Fragment(), GestureDetector.OnGestureListener{
+class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AllWallpaperAdapter
@@ -46,29 +41,58 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
     private var navController: NavController? = null
 
     companion object {
-        const val MINI_DISTANCE = 150
+        const val MINI_DISTANCE = 50
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
+        initViews(view)
+        initRecyclerView()
+        initSwipeRefreshLayout()
+
+        if (wallpaperList.isEmpty()) {
+            showSpinner()
+            loadWallpapers()
+        }
+
+        return view
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initSwipeRefreshLayout() {
+//        swipeRefreshLayout.setOnRefreshListener {
+//            loadWallpapers()
+//        }
+
+        recyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            if (event.action == MotionEvent.ACTION_UP) {
+                handleSwipeGesture(event)
+            }
+            false
+        }
+    }
+
+    private fun initViews(view: View) {
+        recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
         spinner = view.findViewById(R.id.spinner)
         notFoundTextView = view.findViewById(R.id.not_found_text_view2)
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
         navController = findNavController()
         gestureDetector = GestureDetector(requireContext(), this)
+    }
 
-        adapter = AllWallpaperAdapter(requireContext(), wallpaperList)
+    private fun initRecyclerView() {
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+        adapter = AllWallpaperAdapter(requireContext(), wallpaperList,findNavController())
         recyclerView.adapter = adapter
 
-        viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
 
+        viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
         viewModel.wallpapers.observe(viewLifecycleOwner) { wallpapers ->
             wallpaperList.clear()
             wallpaperList.addAll(wallpapers)
@@ -76,39 +100,6 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
             hideSpinner()
             notFoundTextView.visibility = if (wallpaperList.isEmpty()) View.VISIBLE else View.GONE
         }
-
-        if (savedInstanceState != null) {
-            recyclerViewState = savedInstanceState.getParcelable("recyclerViewState")
-        }
-
-
-        swipeRefreshLayout.setOnRefreshListener {
-            loadWallpapers()
-        }
-
-        if (wallpaperList.isEmpty()) {
-            showSpinner()
-            loadWallpapers()
-        }
-
-        swipeRefreshLayout.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP) {
-                handleSwipeGesture(event)
-            }
-            true
-        }
-
-        recyclerView.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP) {
-                handleSwipeGesture(event)
-            }
-            true
-        }
-
-
-        return view
     }
 
     private fun handleSwipeGesture(event: MotionEvent) {
@@ -118,11 +109,9 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
         y2 = event.y
         val deltaX = x2 - x1
         val deltaY = y2 - y1
-        if (abs(deltaX) > Ringtone.MINI_DISTANCE && abs(deltaY) < Ringtone.MINI_DISTANCE) {
-            if (deltaX > 0) {
-
-            } else {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtone) }
+        if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
+            if (deltaX < 0) {
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
             }
         }
 
@@ -130,25 +119,10 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
         y1 = 0f
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (::recyclerView.isInitialized) {
-            outState.putParcelable("recyclerViewState", recyclerView.layoutManager?.onSaveInstanceState())
-        }
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        if (savedInstanceState != null) {
-            recyclerViewState = savedInstanceState.getParcelable("recyclerViewState")
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
     }
-
 
     private fun showSpinner() {
         spinner.visibility = View.VISIBLE
@@ -165,12 +139,10 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
     private fun loadWallpapers() {
         db = FirebaseFirestore.getInstance()
 
-        // Fetch wallpapers from the main collection
         db.collection("wallpapers").get()
             .addOnSuccessListener { result ->
                 val wallpapers = mutableListOf<AllWallpaperDetailItem>()
 
-                // Loop through the main collection documents
                 for (document in result) {
                     val imageUrl = document.getString("Cover") ?: ""
                     if (imageUrl.isNotEmpty()) {
@@ -188,7 +160,7 @@ class Home : Fragment(), GestureDetector.OnGestureListener{
                                 }
                             }
 
-                            // Update UI after fetching sub-collection data
+                            // Update UI
                             if (wallpapers.isEmpty()) {
                                 notFoundTextView.visibility = View.VISIBLE
                             } else {

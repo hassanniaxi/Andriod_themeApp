@@ -1,7 +1,6 @@
 package com.example.myapplication.wallpaper
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -18,8 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
-import com.example.myapplication.ringtone.NavigationHandler
-import com.example.myapplication.ringtone.Ringtone
+import com.example.myapplication.NavigationHandler
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.abs
 
@@ -41,7 +39,7 @@ class Wallpaper : Fragment(), GestureDetector.OnGestureListener{
     private var navController: NavController? = null
 
     companion object {
-        const val MINI_DISTANCE = 150
+        const val MINI_DISTANCE = 50
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -59,7 +57,7 @@ class Wallpaper : Fragment(), GestureDetector.OnGestureListener{
         navController = findNavController()
         gestureDetector = GestureDetector(requireContext(), this)
 
-        adapter = WallpaperAdapter(requireContext(), wallpaperList)
+        adapter = WallpaperAdapter(requireContext(), wallpaperList, findNavController())
         recyclerView.adapter = adapter
 
         viewModel = ViewModelProvider(this).get(WallpaperViewModel::class.java)
@@ -72,21 +70,13 @@ class Wallpaper : Fragment(), GestureDetector.OnGestureListener{
             notFoundTextView.visibility = if (wallpaperList.isEmpty()) View.VISIBLE else View.GONE
         }
 
-        swipeRefreshLayout.setOnRefreshListener {
-            loadWallpapers()
-        }
+//        swipeRefreshLayout.setOnRefreshListener {
+//            loadWallpapers()
+//        }
 
         if (wallpaperList.isEmpty()) {
             showSpinner()
             loadWallpapers()
-        }
-
-        swipeRefreshLayout.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP) {
-                handleSwipeGesture(event)
-            }
-            true
         }
 
         recyclerView.setOnTouchListener { _, event ->
@@ -94,26 +84,26 @@ class Wallpaper : Fragment(), GestureDetector.OnGestureListener{
             if (event.action == MotionEvent.ACTION_UP) {
                 handleSwipeGesture(event)
             }
-            true
+          false
         }
 
         return view
     }
 
     private fun handleSwipeGesture(event: MotionEvent) {
-        if (x1 == 0f && y1 == 0f) return // Check initial values
+        if (x1 == 0f && y1 == 0f) return
 
         x2 = event.x
         y2 = event.y
         val deltaX = x2 - x1
         val deltaY = y2 - y1
-        if (abs(deltaX) > Ringtone.MINI_DISTANCE && abs(deltaY) < Ringtone.MINI_DISTANCE) {
+        if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtone) }
-            } else {
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
+            }else{
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }
-
         x1 = 0f
         y1 = 0f
     }

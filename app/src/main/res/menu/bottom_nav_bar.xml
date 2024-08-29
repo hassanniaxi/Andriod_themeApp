@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="@string/home"  android:icon="@drawable/hom" android:id="@+id/home"/>
-    <item android:title="@string/ringtone" android:id="@+id/ringtone" android:icon="@drawable/ringtone_icon" />
-    <item android:title="@string/wallpaper" android:icon="@drawable/wallicon" android:id="@+id/wallpaper"/>
+    <item android:title="@string/wallpapers"  android:icon="@drawable/wallicon" android:id="@+id/wallpapers" />
+    <item android:title="@string/ringtones" android:icon="@drawable/ringtone_icon" android:id="@+id/ringtones" />
+    <item android:title="@string/wallpaper_category" android:icon="@drawable/wall_category_icon" android:id="@+id/wallpaper_category"/>
+    <item android:title="@string/live_wallpapers" android:icon="@drawable/live_wall_icon" android:id="@+id/live_wallpapers"/>
 </menu>

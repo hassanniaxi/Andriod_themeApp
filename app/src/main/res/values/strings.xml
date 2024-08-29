@@ -42,4 +42,7 @@
     <string name="name">Name</string>
     <string name="date">Date</string>
     <string name="artist">Artist</string>
+    <string name="live_wallpapers">Live Wallpapers</string>
+    <string name="ringtones">Ringtones</string>
+    <string name="wallpaper_category">Wallpaper Category</string>
 </resources>

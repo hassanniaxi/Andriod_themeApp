@@ -30,6 +30,6 @@
         app:itemBackground="@color/blue"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:itemIconSize="30sp"
+        app:itemIconSize="@dimen/_20ssp"
         app:itemActiveIndicatorStyle="@style/App.Custom.Indicator" />
 </androidx.constraintlayout.widget.ConstraintLayout>

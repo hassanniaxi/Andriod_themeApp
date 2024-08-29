@@ -2,25 +2,30 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/home">
+    app:startDestination="@id/wallpapers">
 
     <fragment
-        android:id="@+id/home"
-        android:name="com.example.myapplication.Home"
-        android:label="Home">
+        android:id="@+id/wallpapers"
+        android:name="com.example.myapplication.all_wallpapers.AllWallpapers"
+        android:label="Wallpapers">
     </fragment>
 
     <fragment
-        android:id="@+id/wallpaper"
-        android:name="com.example.myapplication.wallpaper.Wallpaper"
-        android:label="Profile">
-    </fragment>
-
-    <fragment
-        android:id="@+id/ringtone"
+        android:id="@+id/ringtones"
         android:name="com.example.myapplication.ringtone.Ringtone"
-        android:label="Ringtone">
+        android:label="Ringtones">
+    </fragment>
 
+    <fragment
+        android:id="@+id/wallpaper_category"
+        android:name="com.example.myapplication.wallpaper.Wallpaper"
+        android:label="Ringtone">
+    </fragment>
+
+    <fragment
+        android:id="@+id/live_wallpapers"
+        android:name="com.example.myapplication.LiveWallpapers"
+        android:label="Live Wallpapers">
     </fragment>
 
 </navigation>

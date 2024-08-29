@@ -2,14 +2,11 @@ package com.example.myapplication.ringtone
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.Menu
@@ -33,6 +30,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.myapplication.NavigationHandler
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.google.firebase.firestore.FirebaseFirestore
@@ -60,7 +58,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private var y2: Float = 0.0f
 
     companion object {
-        const val MINI_DISTANCE = 150
+        const val MINI_DISTANCE = 50
     }
 
     private var currentFilter: Int? = 1
@@ -114,7 +112,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         }
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = RingtoneAdapter(ringtoneList, requireContext())
+        adapter = RingtoneAdapter(ringtoneList, requireContext(), findNavController())
         recyclerView.adapter = adapter
 
         // Set up SearchView with debounce
@@ -169,24 +167,16 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             toggleSearchView()
         }
 
-        swipeRefreshLayout.setOnRefreshListener {
-            loadRingtones()
-        }
-
-        swipeRefreshLayout.setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP) {
-                handleSwipeGesture(event)
-            }
-            true
-        }
+//        swipeRefreshLayout.setOnRefreshListener {
+//            loadRingtones()
+//        }
 
         recyclerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             if (event.action == MotionEvent.ACTION_UP) {
                 handleSwipeGesture(event)
             }
-            true
+          false
         }
 
         setupCategoryFilters()
@@ -243,11 +233,9 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-//                applyGeneralFilter("swipe_left")
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.home) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpapers) }
             } else {
-//                applyGeneralFilter("swipe_right")
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper_category) }
             }
         }
 

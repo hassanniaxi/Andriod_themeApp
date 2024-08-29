@@ -1,5 +1,6 @@
-package com.example.myapplication.wallpaper
+package com.example.myapplication.all_wallpapers
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.GestureDetector
@@ -8,19 +9,19 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.NavigationHandler
+import com.example.myapplication.wallpaper.ApplyWallpaper
 import kotlin.math.abs
 
-class WallpaperAdapter(
+class AllWallpaperAdapter(
     private val context: Context,
-    private val wallpaperList: List<WallpaperItem>,
+    private val wallpaperList: List<AllWallpaperDetailItem>,
     private val navController: NavController
-) : RecyclerView.Adapter<WallpaperAdapter.MyHolder>() {
+) : RecyclerView.Adapter<AllWallpaperAdapter.MyHolder>() {
 
     private var x1: Float = 0.0f
     private var y1: Float = 0.0f
@@ -33,21 +34,17 @@ class WallpaperAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.data_layer, parent, false)
+            .inflate(R.layout.data_layer_wallpaper_detail, parent, false)
         return MyHolder(view)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val item = wallpaperList[position]
-        holder.wallpaperTitle.text = item.title
-        Glide.with(context).load(item.imageUrl).error(R.drawable.baseline_error_outline_24).into(holder.wallpaperImage)
-
-        holder.itemView.setOnClickListener {
-            val intent = Intent(context, WallpaperDetailActivity::class.java).apply {
-                putExtra(WallpaperDetailActivity.EXTRA_WALLPAPER_TITLE, item.title)
-            }
-            context.startActivity(intent)
-        }
+        Glide.with(context)
+            .load(item.imageUrl)
+            .error(R.drawable.baseline_error_outline_24)
+            .into(holder.wallpaperImage)
 
         holder.itemView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
@@ -56,13 +53,19 @@ class WallpaperAdapter(
             }
             false
         }
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ApplyWallpaper::class.java).apply {
+                putExtra(ApplyWallpaper.APPLY_WALLPAPER, item.imageUrl)
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = wallpaperList.size
 
     inner class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val wallpaperImage: ImageView = itemView.findViewById(R.id.wall_cover)
-        val wallpaperTitle: TextView = itemView.findViewById(R.id.wall_cover_title)
     }
 
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -79,10 +82,8 @@ class WallpaperAdapter(
         val deltaX = x2 - x1
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
-            if (deltaX > 0) {
+            if (deltaX < 0) {
                 navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
-            }else{
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }
     }

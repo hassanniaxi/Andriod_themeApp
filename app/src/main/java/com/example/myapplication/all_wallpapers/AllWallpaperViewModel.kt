@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.all_wallpapers
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
