@@ -6,30 +6,56 @@
     android:layout_height="match_parent"
     style="@style/backgrounds">
 
-    <fragment
-        android:id="@+id/nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/nav_bottom"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/navigation" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nav_bottom"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav_bar"
-        app:itemBackground="@color/blue"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
-        app:itemIconSize="@dimen/_20ssp"
-        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator" />
+        android:layout_margin="@dimen/_5sdp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/all_wallpapers"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button_background"
+            android:text="@string/all_wallpapers"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14ssp" />
+
+        <Button
+            android:id="@+id/wallpaper_cat"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/rounded_button_background"
+            android:text="@string/wallpaper_category"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14ssp"/>
+
+        <Button
+            android:id="@+id/live_wall"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/rounded_button_background"
+            android:text="@string/live_wallpapers"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14ssp"
+            />
+
+        <Button
+            android:id="@+id/ringtones"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/rounded_button_background"
+            android:text="@string/ringtones"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14ssp" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

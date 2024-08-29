@@ -45,4 +45,5 @@
     <string name="live_wallpapers">Live Wallpapers</string>
     <string name="ringtones">Ringtones</string>
     <string name="wallpaper_category">Wallpaper Category</string>
+    <string name="all_wallpapers">All Wallpapers</string>
 </resources>
