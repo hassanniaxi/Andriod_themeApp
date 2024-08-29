@@ -26,7 +26,7 @@ class LiveWallpapers : Fragment(), GestureDetector.OnGestureListener{
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: LiveWallpapersAdapter
-    private val wallpaperList = mutableListOf<LiveWallpaperlItems>()
+    private val wallpaperList = mutableListOf<LiveWallpaperItems>()
     private lateinit var db: FirebaseFirestore
     private lateinit var notFoundTextView: TextView
     private lateinit var spinner: ProgressBar
@@ -137,43 +137,26 @@ class LiveWallpapers : Fragment(), GestureDetector.OnGestureListener{
     }
 
     private fun loadWallpapers() {
-        db = FirebaseFirestore.getInstance()
+        val db = FirebaseFirestore.getInstance()
 
-        db.collection("wallpapers").get()
+        db.collection("live_wallpapers").get()
             .addOnSuccessListener { result ->
-                val wallpapers = mutableListOf<LiveWallpaperlItems>()
+                val wallpapers = mutableListOf<LiveWallpaperItems>()
 
                 for (document in result) {
-                    val imageUrl = document.getString("Cover") ?: ""
-                    if (imageUrl.isNotEmpty()) {
-                        wallpapers.add(LiveWallpaperlItems(imageUrl))
+                    val wallpaperUrl = document.getString("url") ?: ""
+                    if (wallpaperUrl.isNotEmpty()) {
+                        wallpapers.add(LiveWallpaperItems(wallpaperUrl))
                     }
-
-                    // Fetch wallpapers from the sub-collection for each document
-                    db.collection("wallpapers").document(document.id).collection("detail")
-                        .get()
-                        .addOnSuccessListener { subResult ->
-                            for (subDocument in subResult) {
-                                val subImageUrl = subDocument.getString("url") ?: ""
-                                if (subImageUrl.isNotEmpty()) {
-                                    wallpapers.add(LiveWallpaperlItems(subImageUrl))
-                                }
-                            }
-
-                            // Update UI
-                            if (wallpapers.isEmpty()) {
-                                notFoundTextView.visibility = View.VISIBLE
-                            } else {
-                                viewModel.setWallpapers(wallpapers)
-                            }
-                            hideSpinner()
-                        }
-                        .addOnFailureListener { subException ->
-                            hideSpinner()
-                            notFoundTextView.visibility = View.VISIBLE
-                            notFoundTextView.text = "Error loading sub-collection: ${subException.message}"
-                        }
                 }
+
+                // Update UI
+                if (wallpapers.isEmpty()) {
+                    notFoundTextView.visibility = View.VISIBLE
+                } else {
+                    viewModel.setWallpapers(wallpapers)
+                }
+                hideSpinner()
             }
             .addOnFailureListener { exception ->
                 hideSpinner()
@@ -181,6 +164,7 @@ class LiveWallpapers : Fragment(), GestureDetector.OnGestureListener{
                 notFoundTextView.text = "Error: ${exception.message}"
             }
     }
+
 
     override fun onDown(e: MotionEvent): Boolean {
         x1 = e.x

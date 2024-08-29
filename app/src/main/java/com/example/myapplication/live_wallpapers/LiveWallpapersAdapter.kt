@@ -18,7 +18,7 @@ import kotlin.math.abs
 
 class LiveWallpapersAdapter(
     private val context: Context,
-    private val wallpaperList: List<LiveWallpaperlItems>,
+    private val wallpaperList: List<LiveWallpaperItems>,
     private val navController: NavController
 ) : RecyclerView.Adapter<LiveWallpapersAdapter.MyHolder>() {
 
@@ -54,8 +54,8 @@ class LiveWallpapersAdapter(
         }
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(context, ApplyWallpaper::class.java).apply {
-                putExtra(ApplyWallpaper.APPLY_WALLPAPER, item.imageUrl)
+            val intent = Intent(context, ApplyLiveWallpaper::class.java).apply {
+                putExtra(ApplyLiveWallpaper.APPLY_WALLPAPER, item.imageUrl)
             }
             context.startActivity(intent)
         }
