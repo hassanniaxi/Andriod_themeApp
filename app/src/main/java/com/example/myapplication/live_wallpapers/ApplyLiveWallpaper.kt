@@ -4,15 +4,19 @@ import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.WallpaperManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.VideoView
@@ -25,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 
 class ApplyLiveWallpaper : AppCompatActivity() {
 
@@ -35,6 +40,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
     private var downloadID: Long = 0L
     private var downloadedFileName: String = ""
     private val handler = Handler(Looper.getMainLooper())
+    private var currentVideoPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,15 +51,22 @@ class ApplyLiveWallpaper : AppCompatActivity() {
 
         myWallpaper = findViewById(R.id.to_apply_wallpaper)
 
-        showSpinner()
-        myWallpaper.setMediaController(null)
-
-        myWallpaper.setOnPreparedListener { mediaPlayer ->
-            mediaPlayer.isLooping = true
-            hideSpinner()
-        }
-
         intent?.let {
+            showSpinner()
+            myWallpaper.setMediaController(null)
+
+            myWallpaper.setOnPreparedListener { mediaPlayer ->
+                mediaPlayer.isLooping = true
+                hideSpinner()
+            }
+
+            myWallpaper.setOnErrorListener { mp, what, extra ->
+                Toast.makeText(this, "Failed to load video", Toast.LENGTH_SHORT).show()
+                hideSpinner()
+                true
+            }
+
+
             val applyingWallpaper = it.getStringExtra(APPLY_WALLPAPER)
             videoUri = Uri.parse(applyingWallpaper)
             myWallpaper.setVideoURI(videoUri)
@@ -66,7 +79,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
             binding.applyWallpaperOn.setOnClickListener {
                 binding.applyWallpaperOn.isEnabled = false
                 binding.applyWallpaperOn.text = "Starting download..."
-                downloadedFileName = "live_wallpaper_1.mp4"
+                downloadedFileName = "live_wallpaper_${System.currentTimeMillis()}.mp4"
                 download(videoUri, downloadedFileName)
             }
         } ?: run {
@@ -76,7 +89,6 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         // Register receiver to listen for the download completion
         registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
-
     private fun showSpinner() {
         bindingForLoading.spinner.visibility = View.VISIBLE
         bindingForLoading.overlay.visibility = View.VISIBLE
@@ -100,7 +112,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
 
             // Start download and save download ID
             downloadID = downloadManager.enqueue(request)
-            Toast.makeText(this, "Downloading wallpaper...", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Downloading wallpaper...", Toast.LENGTH_SHORT).show()
 
             // Start checking progress
             handler.postDelayed(checkDownloadProgress, 1000)
@@ -148,7 +160,8 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == downloadID) {
-                Toast.makeText(context, "Wallpaper downloaded successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Wallpaper downloaded successfully", Toast.LENGTH_SHORT)
+                    .show()
                 handler.removeCallbacks(checkDownloadProgress)
                 binding.applyWallpaperOn.text = "Apply to Lock Screen"
                 binding.applyWallpaperOn.isEnabled = true
@@ -159,6 +172,8 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         }
     }
 
+
+
     private fun applyWallpaperToLockScreen() {
         lifecycleScope.launch {
             showSpinner()
@@ -167,29 +182,51 @@ class ApplyLiveWallpaper : AppCompatActivity() {
 
             try {
                 withContext(Dispatchers.IO) {
-                    val wallpaperManager = WallpaperManager.getInstance(this@ApplyLiveWallpaper)
-                    val downloadedFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), downloadedFileName)
+                    // Save the video path in shared preferences
+                    val sharedPreferences = getSharedPreferences("live_wallpaper_prefs", Context.MODE_PRIVATE)
+                    with(sharedPreferences.edit()) {
+                        putString("video_path", videoUri.toString())
+                        apply()
+                    }
 
-                    wallpaperManager.setStream(downloadedFile.inputStream(), null, true, WallpaperManager.FLAG_LOCK)
+                    // Create an intent to launch the live wallpaper preview
+                    val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                        putExtra(
+                            WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                            ComponentName(this@ApplyLiveWallpaper, VideoWallpaperService::class.java)
+                        )
+                    }
+
+                    // Launch the intent
+                    startActivity(intent)
                 }
-                Toast.makeText(this@ApplyLiveWallpaper, "Wallpaper applied to lock screen", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
+          } catch (e: Exception) {
                 Toast.makeText(this@ApplyLiveWallpaper, "Failed to apply wallpaper: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
                 hideSpinner()
-                binding.applyWallpaperOn.isEnabled = true
+                binding.applyWallpaperOn.isEnabled = false
                 binding.applyWallpaperOn.text = "Applied to Lock Screen"
             }
         }
     }
 
 
-
     private fun checkAndRequestPermissions() {
-        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val permissions = arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            val notGrantedPermissions = permissions.filter {
+                checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
+            }
+
+            if (notGrantedPermissions.isNotEmpty()) {
+                requestPermissions(notGrantedPermissions.toTypedArray(), STORAGE_PERMISSION_CODE)
+            } else {
+                applyWallpaperToLockScreen()
+            }
         } else {
-            // Permission granted, proceed with applying wallpaper
             applyWallpaperToLockScreen()
         }
     }
@@ -206,9 +243,20 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        currentVideoPosition = myWallpaper.currentPosition
+        myWallpaper.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        myWallpaper.seekTo(currentVideoPosition)
+        myWallpaper.start()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Unregister the receiver and stop the handler when the activity is destroyed
         unregisterReceiver(onDownloadComplete)
         handler.removeCallbacks(checkDownloadProgress)
     }
