@@ -1,60 +1,62 @@
 package com.example.myapplication.live_wallpapers
 
-import android.app.Dialog
+import android.annotation.SuppressLint
+import android.app.DownloadManager
 import android.app.WallpaperManager
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.MediaController
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityApplyLiveWallpaperBinding
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class ApplyLiveWallpaper : AppCompatActivity() {
 
     private lateinit var binding: ActivityApplyLiveWallpaperBinding
     private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
     private lateinit var myWallpaper: VideoView
+    private lateinit var videoUri: Uri
+    private var downloadID: Long = 0L
+    private var downloadedFileName: String = ""
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityApplyLiveWallpaperBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
         binding.root.addView(bindingForLoading.root)
+
         myWallpaper = findViewById(R.id.to_apply_wallpaper)
 
-        // Show spinner while preparing video
         showSpinner()
-
         myWallpaper.setMediaController(null)
 
-        // Hide spinner when video is prepared and ready to play
         myWallpaper.setOnPreparedListener { mediaPlayer ->
             mediaPlayer.isLooping = true
-            hideSpinner()  // Hide spinner when video is ready
+            hideSpinner()
         }
 
         intent?.let {
             val applyingWallpaper = it.getStringExtra(APPLY_WALLPAPER)
-            val wall = Uri.parse(applyingWallpaper)
-            myWallpaper.setVideoURI(wall)
+            videoUri = Uri.parse(applyingWallpaper)
+            myWallpaper.setVideoURI(videoUri)
             myWallpaper.requestFocus()
             myWallpaper.start()
 
@@ -62,13 +64,17 @@ class ApplyLiveWallpaper : AppCompatActivity() {
                 finish()
             }
             binding.applyWallpaperOn.setOnClickListener {
-                if (applyingWallpaper != null) {
-                    showBottomDialog(applyingWallpaper)
-                }
+                binding.applyWallpaperOn.isEnabled = false
+                binding.applyWallpaperOn.text = "Starting download..."
+                downloadedFileName = "live_wallpaper_1.mp4"
+                download(videoUri, downloadedFileName)
             }
         } ?: run {
             finish()
         }
+
+        // Register receiver to listen for the download completion
+        registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
 
     private fun showSpinner() {
@@ -81,85 +87,134 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         bindingForLoading.overlay.visibility = View.GONE
     }
 
-    private fun showBottomDialog(imageUrl: String) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.bottom_sheet_dialog_apply_wallpaper)
+    private fun download(url: Uri, fileName: String) {
+        try {
+            val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val request = DownloadManager.Request(url)
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI)
+                .setMimeType("video/mp4")
+                .setAllowedOverRoaming(false)
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setTitle("Downloading wallpaper")
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, File.separator + fileName)
 
-        val homeScreen = dialog.findViewById<LinearLayout>(R.id.setOnHomeScreen)
-        val lockScreen = dialog.findViewById<LinearLayout>(R.id.setOnLockScreen)
-        val homeAndLockScreens = dialog.findViewById<LinearLayout>(R.id.setOnHomeAndLockScreen)
-        val cancelButton = dialog.findViewById<ImageView>(R.id.cancelButton)
+            // Start download and save download ID
+            downloadID = downloadManager.enqueue(request)
+            Toast.makeText(this, "Downloading wallpaper...", Toast.LENGTH_SHORT).show()
 
-        homeScreen.setOnClickListener {
-            applyWallpaper(imageUrl, 0)
-            dialog.dismiss()
+            // Start checking progress
+            handler.postDelayed(checkDownloadProgress, 1000)
+        } catch (e: Exception) {
+            binding.applyWallpaperOn.isEnabled = true
+            binding.applyWallpaperOn.text = getString(R.string.download)
+            Toast.makeText(this, "Failed to download wallpaper: ${e.message}", Toast.LENGTH_SHORT).show()
         }
-
-        lockScreen.setOnClickListener {
-            applyWallpaper(imageUrl, 1)
-            dialog.dismiss()
-        }
-
-        homeAndLockScreens.setOnClickListener {
-            applyWallpaper(imageUrl, 2)
-            dialog.dismiss()
-        }
-
-        cancelButton.setOnClickListener { dialog.dismiss() }
-
-        dialog.show()
-        dialog.window!!.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
-        dialog.window!!.setGravity(Gravity.BOTTOM)
     }
 
-    private fun applyWallpaper(imageUrl: String, selectedOption: Int) {
-        showSpinner()
+    // Runnable to check download progress
+    private val checkDownloadProgress: Runnable = object : Runnable {
+        @SuppressLint("Range")
+        override fun run() {
+            val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val query = DownloadManager.Query().setFilterById(downloadID)
+            val cursor = downloadManager.query(query)
 
-        Glide.with(this)
-            .asBitmap()
-            .load(imageUrl)
-            .into(object : CustomTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val wallpaperManager = WallpaperManager.getInstance(this@ApplyLiveWallpaper)
-                        try {
-                            when (selectedOption) {
-                                0 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                                1 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
-                                2 -> {
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
-                                }
-                                else -> withContext(Dispatchers.Main) {
-                                    Toast.makeText(this@ApplyLiveWallpaper, "No option selected", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@ApplyLiveWallpaper, "Wallpaper set successfully", Toast.LENGTH_SHORT).show()
-                                hideSpinner() // Ensure this is on the main thread
-                            }
-                        } catch (e: Exception) {
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@ApplyLiveWallpaper, "Failed to set wallpaper: ${e.message}", Toast.LENGTH_LONG).show()
-                                hideSpinner() // Ensure this is on the main thread
-                            }
-                        }
-                    }
+            if (cursor.moveToFirst()) {
+                val bytesDownloaded =
+                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                val totalBytes =
+                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+
+                if (totalBytes > 0) {
+                    val progress = (bytesDownloaded * 100L) / totalBytes
+                    binding.applyWallpaperOn.text = "Downloading... $progress%"
                 }
 
-                override fun onLoadCleared(placeholder: Drawable?) {
-                    // Handle placeholder if needed
+                if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                    binding.applyWallpaperOn.text = "Apply Wallpaper"
+                    binding.applyWallpaperOn.isEnabled = true
+                    return  // Stop the handler
                 }
-            })
+            }
+            cursor.close()
+
+            // Continue checking progress
+            handler.postDelayed(this, 1000)
+        }
+    }
+
+    // BroadcastReceiver to handle download completion
+    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            if (id == downloadID) {
+                Toast.makeText(context, "Wallpaper downloaded successfully", Toast.LENGTH_SHORT).show()
+                handler.removeCallbacks(checkDownloadProgress)
+                binding.applyWallpaperOn.text = "Apply to Lock Screen"
+                binding.applyWallpaperOn.isEnabled = true
+                binding.applyWallpaperOn.setOnClickListener {
+                    checkAndRequestPermissions()
+                }
+            }
+        }
+    }
+
+    private fun applyWallpaperToLockScreen() {
+        lifecycleScope.launch {
+            showSpinner()
+            binding.applyWallpaperOn.isEnabled = false
+            binding.applyWallpaperOn.text = "Applying..."
+
+            try {
+                withContext(Dispatchers.IO) {
+                    val wallpaperManager = WallpaperManager.getInstance(this@ApplyLiveWallpaper)
+                    val downloadedFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), downloadedFileName)
+
+                    wallpaperManager.setStream(downloadedFile.inputStream(), null, true, WallpaperManager.FLAG_LOCK)
+                }
+                Toast.makeText(this@ApplyLiveWallpaper, "Wallpaper applied to lock screen", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@ApplyLiveWallpaper, "Failed to apply wallpaper: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                hideSpinner()
+                binding.applyWallpaperOn.isEnabled = true
+                binding.applyWallpaperOn.text = "Applied to Lock Screen"
+            }
+        }
+    }
+
+
+
+    private fun checkAndRequestPermissions() {
+        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION_CODE)
+        } else {
+            // Permission granted, proceed with applying wallpaper
+            applyWallpaperToLockScreen()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with applying wallpaper
+                applyWallpaperToLockScreen()
+            } else {
+                Toast.makeText(this, "Permission denied. Unable to apply wallpaper.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the receiver and stop the handler when the activity is destroyed
+        unregisterReceiver(onDownloadComplete)
+        handler.removeCallbacks(checkDownloadProgress)
     }
 
     companion object {
         const val APPLY_WALLPAPER = "apply_wallpaper"
+        private val STORAGE_PERMISSION_CODE = 1001
     }
 }

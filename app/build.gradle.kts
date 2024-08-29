@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
 
     implementation (libs.gson)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.room.ktx)
 
     // Testing dependencies
     testImplementation(libs.junit)

@@ -1,0 +1,5 @@
+<wallpaper
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:thumbnail="@drawable/my_app_logo"
+    android:description="@string/hi"
+    android:settingsActivity="com.example.myapplication.live_wallpapers.ApplyLiveWallpaper"/>

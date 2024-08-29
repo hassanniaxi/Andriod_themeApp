@@ -52,7 +52,7 @@
             android:layout_height="@dimen/_35sdp"
             android:layout_marginBottom="@dimen/_10sdp"
             android:background="@drawable/rounded_button_background"
-            android:text="@string/apply"
+            android:text="@string/download"
             android:textColor="@color/white"
             android:textSize="@dimen/_14ssp"
             android:textStyle="bold"
