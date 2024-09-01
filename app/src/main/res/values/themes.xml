@@ -48,6 +48,15 @@
         <item name="android:indeterminateTint">@color/black</item>
     </style>
 
+    <style name="spinner_overlay">
+        <item name="android:background">@color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
+
+
+
     <style name="actions">
         <item name="android:background">@color/white</item>
         <item name="android:tint">@color/black</item>

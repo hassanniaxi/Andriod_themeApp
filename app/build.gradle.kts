@@ -79,6 +79,7 @@ dependencies {
     implementation (libs.gson)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.media3.ui)
 
     // Testing dependencies
     testImplementation(libs.junit)

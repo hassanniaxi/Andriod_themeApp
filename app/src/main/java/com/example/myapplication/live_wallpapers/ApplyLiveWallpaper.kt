@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -15,13 +16,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityApplyLiveWallpaperBinding
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
@@ -29,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 
 class ApplyLiveWallpaper : AppCompatActivity() {
 
@@ -40,7 +42,10 @@ class ApplyLiveWallpaper : AppCompatActivity() {
     private var downloadID: Long = 0L
     private var downloadedFileName: String = ""
     private val handler = Handler(Looper.getMainLooper())
-    private var currentVideoPosition: Int = 0
+    private lateinit var sharedPreferences: SharedPreferences
+
+    private lateinit var playerView: PlayerView
+    private lateinit var exoPlayer: ExoPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,39 +54,60 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
         binding.root.addView(bindingForLoading.root)
 
-        myWallpaper = findViewById(R.id.to_apply_wallpaper)
+        sharedPreferences = getSharedPreferences("wallpaper_prefs", Context.MODE_PRIVATE)
+
+        playerView = binding.toApplyWallpaper// Ensure your layout has a PlayerView
+        exoPlayer = ExoPlayer.Builder(this).build()
+        playerView.player = exoPlayer
 
         intent?.let {
             showSpinner()
-            myWallpaper.setMediaController(null)
-
-            myWallpaper.setOnPreparedListener { mediaPlayer ->
-                mediaPlayer.isLooping = true
-                hideSpinner()
-            }
-
-            myWallpaper.setOnErrorListener { mp, what, extra ->
-                Toast.makeText(this, "Failed to load video", Toast.LENGTH_SHORT).show()
-                hideSpinner()
-                true
-            }
-
 
             val applyingWallpaper = it.getStringExtra(APPLY_WALLPAPER)
             videoUri = Uri.parse(applyingWallpaper)
-            myWallpaper.setVideoURI(videoUri)
-            myWallpaper.requestFocus()
-            myWallpaper.start()
+            val wallpaperTitle = extractWallpaperTitleFromUri(videoUri)
+
+            // Load the video into ExoPlayer
+            val mediaItem = MediaItem.fromUri(videoUri)
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+            exoPlayer.playWhenReady = true
+
+            // Stop spinner when the video is ready
+            exoPlayer.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    if (playbackState == Player.STATE_READY) {
+                        hideSpinner()
+                    }
+                }
+            })
+
+            // Loop the video
+            exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
 
             binding.backToWallpapers.setOnClickListener {
                 finish()
             }
-            binding.applyWallpaperOn.setOnClickListener {
-                binding.applyWallpaperOn.isEnabled = false
-                binding.applyWallpaperOn.text = "Starting download..."
-                downloadedFileName = "live_wallpaper_${System.currentTimeMillis()}.mp4"
-                download(videoUri, downloadedFileName)
+
+            if (!isWallpaperDownloaded(wallpaperTitle)) {
+                binding.applyWallpaperOn.text = "Download"
+            } else {
+                binding.applyWallpaperOn.text = "Apply Wallpaper"
+                binding.applyWallpaperOn.isEnabled = true
             }
+
+            binding.applyWallpaperOn.setOnClickListener {
+                if (!isWallpaperDownloaded(wallpaperTitle)) {
+                    binding.applyWallpaperOn.isEnabled = false
+                    binding.applyWallpaperOn.text = "Starting download..."
+                    downloadedFileName = "live_wallpaper_${wallpaperTitle}.mp4"
+                    download(videoUri, downloadedFileName)
+                } else {
+                    checkAndRequestPermissions()
+                }
+            }
+
+
         } ?: run {
             finish()
         }
@@ -89,6 +115,24 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         // Register receiver to listen for the download completion
         registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
+
+    private fun extractWallpaperTitleFromUri(uri: Uri): String {
+        val path = uri.path
+        return path?.substringAfterLast('/')?.substringBeforeLast('.') ?: "unknown"
+    }
+
+    private fun isWallpaperDownloaded(wallpaperTitle: String): Boolean {
+        val downloadedWallpapers = sharedPreferences.getStringSet("downloaded_wallpapers", mutableSetOf()) ?: mutableSetOf()
+        return downloadedWallpapers.contains(wallpaperTitle)
+    }
+
+    private fun markWallpaperAsDownloaded(wallpaperTitle: String) {
+        val downloadedWallpapers = sharedPreferences.getStringSet("downloaded_wallpapers", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+        downloadedWallpapers.add(wallpaperTitle)
+        sharedPreferences.edit().putStringSet("downloaded_wallpapers", downloadedWallpapers).apply()
+    }
+
+
     private fun showSpinner() {
         bindingForLoading.spinner.visibility = View.VISIBLE
         bindingForLoading.overlay.visibility = View.VISIBLE
@@ -103,6 +147,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         try {
             val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val request = DownloadManager.Request(url)
+
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI)
                 .setMimeType("video/mp4")
                 .setAllowedOverRoaming(false)
@@ -110,9 +155,9 @@ class ApplyLiveWallpaper : AppCompatActivity() {
                 .setTitle("Downloading wallpaper")
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, File.separator + fileName)
 
-            // Start download and save download ID
             downloadID = downloadManager.enqueue(request)
-//            Toast.makeText(this, "Downloading wallpaper...", Toast.LENGTH_SHORT).show()
+            val wallpaperTitle = extractWallpaperTitleFromUri(url)
+            markWallpaperAsDownloaded(wallpaperTitle)
 
             // Start checking progress
             handler.postDelayed(checkDownloadProgress, 1000)
@@ -161,6 +206,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (id == downloadID) {
                 Toast.makeText(context, "Wallpaper downloaded successfully", Toast.LENGTH_SHORT)
+
                     .show()
                 handler.removeCallbacks(checkDownloadProgress)
                 binding.applyWallpaperOn.text = "Apply to Lock Screen"
@@ -200,7 +246,7 @@ class ApplyLiveWallpaper : AppCompatActivity() {
                     // Launch the intent
                     startActivity(intent)
                 }
-          } catch (e: Exception) {
+            } catch (e: Exception) {
                 Toast.makeText(this@ApplyLiveWallpaper, "Failed to apply wallpaper: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
                 hideSpinner()
@@ -241,18 +287,6 @@ class ApplyLiveWallpaper : AppCompatActivity() {
                 Toast.makeText(this, "Permission denied. Unable to apply wallpaper.", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        currentVideoPosition = myWallpaper.currentPosition
-        myWallpaper.pause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        myWallpaper.seekTo(currentVideoPosition)
-        myWallpaper.start()
     }
 
     override fun onDestroy() {

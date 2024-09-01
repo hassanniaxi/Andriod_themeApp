@@ -36,7 +36,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <VideoView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/to_apply_wallpaper"
         android:layout_width="@dimen/_300sdp"
         android:layout_height="@dimen/_500sdp"
@@ -44,9 +44,12 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_gravity="center"
         android:scaleType="center"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"/>
+        app:use_controller="false"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        tools:ignore="MissingClass" />
 
-        <Button
+
+    <Button
             android:id="@+id/apply__wallpaper_on"
             android:layout_width="@dimen/_300sdp"
             android:layout_height="@dimen/_35sdp"
