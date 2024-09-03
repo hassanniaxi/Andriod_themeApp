@@ -37,7 +37,6 @@ class ApplyLiveWallpaper : AppCompatActivity() {
 
     private lateinit var binding: ActivityApplyLiveWallpaperBinding
     private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
-    private lateinit var myWallpaper: VideoView
     private lateinit var videoUri: Uri
     private var downloadID: Long = 0L
     private var downloadedFileName: String = ""
@@ -113,7 +112,8 @@ class ApplyLiveWallpaper : AppCompatActivity() {
         }
 
         // Register receiver to listen for the download completion
-        registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+            RECEIVER_EXPORTED)
     }
 
     private fun extractWallpaperTitleFromUri(uri: Uri): String {
@@ -297,6 +297,6 @@ class ApplyLiveWallpaper : AppCompatActivity() {
 
     companion object {
         const val APPLY_WALLPAPER = "apply_wallpaper"
-        private val STORAGE_PERMISSION_CODE = 1001
+        val STORAGE_PERMISSION_CODE = 1001
     }
 }
