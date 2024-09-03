@@ -56,6 +56,16 @@
             android:text="@string/ringtones"
             android:textColor="@color/white"
             android:textSize="@dimen/_14ssp" />
+
+        <Button
+            android:id="@+id/simChk"
+            android:layout_width="@dimen/_250sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="@drawable/rounded_button_background"
+            android:text="How many sims?"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_14ssp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
