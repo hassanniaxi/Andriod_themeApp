@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="@string/wallpapers"  android:icon="@drawable/wallicon" android:id="@+id/wallpapers" />
-    <item android:title="@string/ringtones" android:icon="@drawable/ringtone_icon" android:id="@+id/ringtones" />
-    <item android:title="@string/wallpaper_category" android:icon="@drawable/wall_category_icon" android:id="@+id/wallpaper_category"/>
     <item android:title="@string/live_wallpapers" android:icon="@drawable/live_wall_icon" android:id="@+id/live_wallpapers"/>
+    <item android:title="@string/ringtones" android:icon="@drawable/ringtone_icon" android:id="@+id/ringtones" />
 </menu>

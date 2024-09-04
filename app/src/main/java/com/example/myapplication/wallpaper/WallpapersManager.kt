@@ -1,4 +1,4 @@
-package com.example.myapplication.all_wallpapers
+package com.example.myapplication.wallpaper
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -19,21 +20,31 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
 import com.example.myapplication.NavigationHandler
+import com.example.myapplication.databinding.FragmentWallpaperBinding
+import com.example.myapplication.wallpaper.all.AllWallpaperAdapter
+import com.example.myapplication.wallpaper.all.AllWallpaperViewModel
+import com.example.myapplication.wallpaper.category.CatWallpaperAdapter
+import com.example.myapplication.wallpaper.category.CatWallpaperItem
+import com.example.myapplication.wallpaper.category.CatWallpaperViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.abs
 
-class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
+class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AllWallpaperAdapter
-    private val wallpaperList = mutableListOf<AllWallpaperDetailItem>()
+    private lateinit var adapterCat: CatWallpaperAdapter
+    private lateinit var viewModel: AllWallpaperViewModel
+    private lateinit var viewCatModel: CatWallpaperViewModel
+    private val wallpaperList = mutableListOf<WallpaperDetailItems>()
+    private val wallpaperCatList = mutableListOf<CatWallpaperItem>()
     private lateinit var db: FirebaseFirestore
     private lateinit var notFoundTextView: TextView
     private lateinit var spinner: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var viewModel: AllWallpaperViewModel
     private var recyclerViewState: Parcelable? = null
     private lateinit var gestureDetector: GestureDetector
+    private lateinit var binding: FragmentWallpaperBinding
     private var x1: Float = 0.0f
     private var x2: Float = 0.0f
     private var y1: Float = 0.0f
@@ -44,29 +55,57 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
         const val MINI_DISTANCE = 50
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        binding = FragmentWallpaperBinding.inflate(inflater, container, false)
+        val view = binding.root
+        recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
+        spinner = view.findViewById(R.id.spinner)
+        notFoundTextView = view.findViewById(R.id.not_found_text_view2)
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
+        navController = findNavController()
+        gestureDetector = GestureDetector(requireContext(), this)
 
-        initViews(view)
-        initRecyclerView()
-        initSwipeRefreshLayout()
+        adapter = AllWallpaperAdapter(requireContext(), wallpaperList,findNavController())
+        adapterCat = CatWallpaperAdapter(requireContext(), wallpaperCatList, findNavController())
 
-        if (wallpaperList.isEmpty()) {
+        viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
+        viewCatModel = ViewModelProvider(this).get(CatWallpaperViewModel::class.java)
+
+
+        // default
+        initRecyclerViewForCat()
+        if (wallpaperCatList.isEmpty()) {
             showSpinner()
-            loadWallpapers()
+            loadCatWallpapers()
         }
 
-        return view
-    }
+        binding.allWallpapers.setOnClickListener{
+            binding.allWallpapers.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.wallpaperCategory.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+            initRecyclerView()
+            if (wallpaperList.isEmpty()) {
+                showSpinner()
+                loadAllWallpapers()
+            }
+        }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initSwipeRefreshLayout() {
-//        swipeRefreshLayout.setOnRefreshListener {
-//            loadWallpapers()
-//        }
+        binding.wallpaperCategory.setOnClickListener{
+            binding.wallpaperCategory.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+            binding.allWallpapers.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+            initRecyclerViewForCat()
+            if (wallpaperCatList.isEmpty()) {
+                showSpinner()
+                loadCatWallpapers()
+            }
+        }
+
+        swipeRefreshLayout.setOnRefreshListener {
+            loadAllWallpapers()
+        }
 
         recyclerView.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
@@ -75,24 +114,13 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
             }
             false
         }
-    }
 
-    private fun initViews(view: View) {
-        recyclerView = view.findViewById(R.id.wallpaper_recycler_view)
-        spinner = view.findViewById(R.id.spinner)
-        notFoundTextView = view.findViewById(R.id.not_found_text_view2)
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
-        navController = findNavController()
-        gestureDetector = GestureDetector(requireContext(), this)
+        return view
     }
 
     private fun initRecyclerView() {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-        adapter = AllWallpaperAdapter(requireContext(), wallpaperList,findNavController())
         recyclerView.adapter = adapter
-
-
-        viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
         viewModel.wallpapers.observe(viewLifecycleOwner) { wallpapers ->
             wallpaperList.clear()
             wallpaperList.addAll(wallpapers)
@@ -102,8 +130,20 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
         }
     }
 
+    private fun initRecyclerViewForCat() {
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        recyclerView.adapter = adapterCat
+        viewCatModel.wallpapers.observe(viewLifecycleOwner) { wallpapers ->
+            wallpaperCatList.clear()
+            wallpaperCatList.addAll(wallpapers)
+            adapter.notifyDataSetChanged()
+            hideSpinner()
+            notFoundTextView.visibility = if (wallpaperCatList.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
     private fun handleSwipeGesture(event: MotionEvent) {
-        if (x1 == 0f && y1 == 0f) return // Check initial values
+        if (x1 == 0f && y1 == 0f) return
 
         x2 = event.x
         y2 = event.y
@@ -111,7 +151,7 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX < 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }
 
@@ -136,17 +176,17 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
         swipeRefreshLayout.isRefreshing = false
     }
 
-    private fun loadWallpapers() {
+    private fun loadAllWallpapers() {
         db = FirebaseFirestore.getInstance()
 
         db.collection("wallpapers").get()
             .addOnSuccessListener { result ->
-                val wallpapers = mutableListOf<AllWallpaperDetailItem>()
+                val wallpapers = mutableListOf<WallpaperDetailItems>()
 
                 for (document in result) {
                     val imageUrl = document.getString("Cover") ?: ""
                     if (imageUrl.isNotEmpty()) {
-                        wallpapers.add(AllWallpaperDetailItem(imageUrl))
+                        wallpapers.add(WallpaperDetailItems(imageUrl))
                     }
 
                     // Fetch wallpapers from the sub-collection for each document
@@ -156,11 +196,10 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
                             for (subDocument in subResult) {
                                 val subImageUrl = subDocument.getString("url") ?: ""
                                 if (subImageUrl.isNotEmpty()) {
-                                    wallpapers.add(AllWallpaperDetailItem(subImageUrl))
+                                    wallpapers.add(WallpaperDetailItems(subImageUrl))
                                 }
                             }
 
-                            // Update UI
                             if (wallpapers.isEmpty()) {
                                 notFoundTextView.visibility = View.VISIBLE
                             } else {
@@ -181,6 +220,29 @@ class AllWallpapers : Fragment(), GestureDetector.OnGestureListener{
                 notFoundTextView.text = "Error: ${exception.message}"
             }
     }
+
+    private fun loadCatWallpapers() {
+        db = FirebaseFirestore.getInstance()
+        db.collection("wallpapers").get()
+            .addOnSuccessListener { result ->
+                val wallpapers = mutableListOf<CatWallpaperItem>()
+                for (document in result) {
+                    val title = document.getString("title") ?: "Unknown"
+                    val imageUrl = document.getString("Cover") ?: ""
+                    wallpapers.add(CatWallpaperItem(title, imageUrl))
+                }
+                viewCatModel.setWallpapers(wallpapers)
+                if (wallpapers.isEmpty()) {
+                    notFoundTextView.visibility = View.VISIBLE
+                }
+            }
+            .addOnFailureListener { exception ->
+                hideSpinner()
+                notFoundTextView.visibility = View.VISIBLE
+                notFoundTextView.text = "Error: ${exception.message}"
+            }
+    }
+
 
     override fun onDown(e: MotionEvent): Boolean {
         x1 = e.x

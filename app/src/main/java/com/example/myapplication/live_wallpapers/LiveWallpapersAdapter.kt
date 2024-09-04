@@ -81,7 +81,7 @@ class LiveWallpapersAdapter(
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper_category) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
             }
         }
     }

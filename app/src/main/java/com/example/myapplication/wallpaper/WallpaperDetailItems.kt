@@ -1,9 +1,9 @@
-package com.example.myapplication.all_wallpapers
+package com.example.myapplication.wallpaper
 
 import android.os.Parcel
 import android.os.Parcelable
 
-data class AllWallpaperDetailItem(
+data class WallpaperDetailItems(
     val imageUrl: String
 ) : Parcelable {
 
@@ -17,12 +17,12 @@ data class AllWallpaperDetailItem(
 
     override fun describeContents(): Int = 0
 
-    companion object CREATOR : Parcelable.Creator<AllWallpaperDetailItem> {
-        override fun createFromParcel(parcel: Parcel): AllWallpaperDetailItem {
-            return AllWallpaperDetailItem(parcel)
+    companion object CREATOR : Parcelable.Creator<WallpaperDetailItems> {
+        override fun createFromParcel(parcel: Parcel): WallpaperDetailItems {
+            return WallpaperDetailItems(parcel)
         }
 
-        override fun newArray(size: Int): Array<AllWallpaperDetailItem?> {
+        override fun newArray(size: Int): Array<WallpaperDetailItems?> {
             return arrayOfNulls(size)
         }
     }

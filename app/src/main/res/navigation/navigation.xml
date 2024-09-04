@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/wallpapers"
-        android:name="com.example.myapplication.all_wallpapers.AllWallpapers"
+        android:name="com.example.myapplication.wallpaper.WallpapersManager"
         android:label="Wallpapers">
     </fragment>
 
@@ -14,12 +14,6 @@
         android:id="@+id/ringtones"
         android:name="com.example.myapplication.ringtone.Ringtone"
         android:label="Ringtones">
-    </fragment>
-
-    <fragment
-        android:id="@+id/wallpaper_category"
-        android:name="com.example.myapplication.wallpaper.Wallpaper"
-        android:label="Ringtone">
     </fragment>
 
     <fragment

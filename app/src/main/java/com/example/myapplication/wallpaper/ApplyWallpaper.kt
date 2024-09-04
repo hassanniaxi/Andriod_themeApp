@@ -2,7 +2,6 @@ package com.example.myapplication.wallpaper
 
 import android.app.Dialog
 import android.app.WallpaperManager
-import android.content.Intent
 import android.os.Bundle
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity

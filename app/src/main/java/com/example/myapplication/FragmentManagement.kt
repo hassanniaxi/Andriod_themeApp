@@ -18,10 +18,7 @@ class FragmentManagement : AppCompatActivity() {
         binding = ActivityFragmentManagementBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize NavController
         navController = findNavController(R.id.nav_host_fragment)
-
-        // Set up navigation
         binding.navBottom.setupWithNavController(navController)
 
         binding.navBottom.setOnItemSelectedListener { item ->

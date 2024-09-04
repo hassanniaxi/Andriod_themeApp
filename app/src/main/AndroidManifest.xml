@@ -37,7 +37,7 @@
             android:name=".wallpaper.ApplyWallpaper"
             android:exported="false" />
         <activity
-            android:name=".wallpaper.WallpaperDetailActivity"
+            android:name=".wallpaper.category.WallpaperDetailActivity"
             android:exported="false" />
         <activity
             android:name=".ringtone.RingtoneDetailActivity"

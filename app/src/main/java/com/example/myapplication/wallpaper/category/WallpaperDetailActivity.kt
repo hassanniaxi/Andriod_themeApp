@@ -1,21 +1,16 @@
-package com.example.myapplication.wallpaper
+package com.example.myapplication.wallpaper.category
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.myapplication.R
-import com.example.myapplication.databinding.ActivityMainBinding
-import com.example.myapplication.databinding.ActivityRingtoneDetailBinding
 import com.example.myapplication.databinding.ActivityWallpaperDetailBinding
+import com.example.myapplication.wallpaper.WallpaperDetailItems
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Locale
 
 class WallpaperDetailActivity : AppCompatActivity() {
 
@@ -25,7 +20,7 @@ class WallpaperDetailActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: WallpaperDetailAdapter
-    private val wallpaperDetailList = mutableListOf<WallpaperDetailItem>()
+    private val wallpaperDetailList = mutableListOf<WallpaperDetailItems>()
     private lateinit var db: FirebaseFirestore
     private lateinit var spinner: ProgressBar
     private lateinit var notFoundTextView: TextView
@@ -79,7 +74,7 @@ class WallpaperDetailActivity : AppCompatActivity() {
                 wallpaperDetailList.clear()
                 for (subDocument in subResult) {
                     val imageUrl = subDocument.getString("url") ?: ""
-                    wallpaperDetailList.add(WallpaperDetailItem(imageUrl))
+                    wallpaperDetailList.add(WallpaperDetailItems(imageUrl))
                 }
                 adapter.notifyDataSetChanged()
                 hideSpinner()

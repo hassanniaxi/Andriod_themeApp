@@ -120,8 +120,8 @@ class RingtoneAdapter(
         val deltaX = x2 - x1
         val deltaY = y2 - y1
         if (abs(deltaX) >MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
-            if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper) }
+            if (deltaX < 0) {
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }
     }
