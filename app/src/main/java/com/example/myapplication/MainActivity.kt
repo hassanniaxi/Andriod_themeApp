@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val intent = Intent(this, FragmentManagement::class.java).apply {
-            putExtra(FragmentManagement.NAV_ID, R.id.ringtones)
+            putExtra(FragmentManagement.NAV_ID, R.id.wallpapers)
         }
         startActivity(intent)
 

@@ -23,6 +23,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/tab_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_6sdp"
+        android:background="@drawable/filters_background"
+        android:orientation="horizontal"
+        android:padding="@dimen/_3sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        <TextView
+            android:id="@+id/wallpaperCategory"
+            android:layout_width="wrap_content"
+            style="@style/filters"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:layout_weight="1"
+            android:text="@string/categories" />
+
+        <TextView
+            android:id="@+id/allWallpapers"
+            android:layout_width="wrap_content"
+            style="@style/filters"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/all_wallpapers" />
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/spinner"
         android:layout_width="wrap_content"
@@ -39,7 +69,7 @@
         android:layout_height="0dp"
         android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView3"
+        app:layout_constraintTop_toBottomOf="@id/tab_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -64,7 +94,7 @@
         android:id="@+id/header_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/home"
+        android:text="@string/wallpaper"
         style="@style/headers"
         android:layout_margin="@dimen/_12sdp"
         app:layout_constraintTop_toTopOf="parent"

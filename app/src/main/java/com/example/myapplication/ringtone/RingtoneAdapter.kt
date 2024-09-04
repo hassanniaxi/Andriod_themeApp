@@ -24,7 +24,6 @@ class RingtoneAdapter(
 ) : RecyclerView.Adapter<RingtoneAdapter.MyHolder>(), Filterable {
 
     private var ringtonesFiltered: List<RingtoneItem> = ringtones
-    private var currentlyPlayingPosition: Int = RecyclerView.NO_POSITION
 
     private var x1: Float = 0.0f
     private var y1: Float = 0.0f
@@ -48,18 +47,7 @@ class RingtoneAdapter(
         holder.authorTextView.text = ringtone.author
 
         holder.playRingtone.setOnClickListener {
-            if (currentlyPlayingPosition != position) {
-                currentlyPlayingPosition = position
-
-                val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
-                    putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
-                    putParcelableArrayListExtra(
-                        RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
-                        ArrayList(ringtonesFiltered)
-                    )
-                }
-                context.startActivity(intent)
-            }
+            navigateToDetailActivity(position-1)
         }
 
         holder.itemView.setOnTouchListener { _, event ->
@@ -70,6 +58,17 @@ class RingtoneAdapter(
             false
         }
     }
+    private fun navigateToDetailActivity(position: Int) {
+        val intent = Intent(context, RingtoneDetailActivity::class.java).apply {
+            putExtra(RingtoneDetailActivity.EXTRA_PLAYING_POSITION, position)
+            putParcelableArrayListExtra(
+                RingtoneDetailActivity.EXTRA_RINGTONE_LIST,
+                ArrayList(ringtonesFiltered)
+            )
+        }
+        context.startActivity(intent)
+    }
+
 
     override fun getItemCount(): Int {
         return ringtonesFiltered.size
@@ -101,7 +100,7 @@ class RingtoneAdapter(
         }
     }
 
-   inner class MyHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MyHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleTextView: TextView = view.findViewById(R.id.ringtone_title)
         val authorTextView: TextView = view.findViewById(R.id.ringtone_author)
         val playRingtone: View = view.findViewById(R.id.play_ring)
@@ -122,9 +121,7 @@ class RingtoneAdapter(
         val deltaY = y2 - y1
         if (abs(deltaX) >MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpapers) }
-            } else {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper_category) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.wallpaper) }
             }
         }
     }
