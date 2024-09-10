@@ -5,9 +5,9 @@
         <item name="colorPrimary">#3867d6</item>
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">#ffff</item>
+        <item name="fontFamily">@font/roboto_regular</item>
 
         <item name="android:statusBarColor">@color/black</item>
-        <!-- Set the navigation bar color -->
         <item name="android:navigationBarColor">@color/black</item>
     </style>
 

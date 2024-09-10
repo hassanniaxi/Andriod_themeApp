@@ -42,9 +42,9 @@
         android:layout_height="@dimen/_500sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_gravity="center"
-        android:scaleType="center"
+        android:scaleType="centerCrop"
         app:use_controller="false"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
         tools:ignore="MissingClass" />
 

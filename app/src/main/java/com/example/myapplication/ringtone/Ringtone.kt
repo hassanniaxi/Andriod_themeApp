@@ -49,7 +49,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     private lateinit var ringtoneSearchButton: ImageButton
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val ringtoneList = mutableListOf<RingtoneItem>()
-    private lateinit var db: FirebaseFirestore
     private lateinit var viewModel: RingtoneViewModel
     private lateinit var navController: NavController
     private lateinit var gestureDetector: GestureDetector
@@ -77,7 +76,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         binding = FragmentRingtoneBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        // Initialize views using binding
         recyclerView = binding.ringtoneRecyclerView
         swipeRefreshLayout = binding.swipeRefreshLayoutRingtone
         notFoundTextView = binding.notFoundTextView
@@ -99,8 +97,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             updateNotFoundMessage(ringtoneList.isEmpty())
         }
 
-
-
         val editText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
         editText?.apply {
             context.theme.obtainStyledAttributes(R.style.actions, intArrayOf(android.R.attr.textColor, android.R.attr.textColorHint)).apply {
@@ -117,7 +113,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         adapter = RingtoneAdapter(ringtoneList, requireContext(), findNavController())
         recyclerView.adapter = adapter
 
-        // Set up SearchView with debounce
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
@@ -165,7 +160,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
         setFilterButtonState(binding.allFilter, binding.alarmFilter,binding.ringtoneFilter,binding.notificationFilter)
 
-        // Handle Search Button click
         ringtoneSearchButton.setOnClickListener {
             toggleSearchView()
         }
@@ -252,12 +246,11 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         val deltaX = x2 - x1
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
-            if (deltaX < 0) {
+            if (deltaX > 0) {
                 navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }
 
-        // Reset touch start position
         x1 = 0f
         y1 = 0f
     }
@@ -334,35 +327,36 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 try {
                     val ringtoneList = listOf(
                         RingtoneItem("Iphone X", "iphone_x", "Apple", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Ringtone"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Alarm"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Iphone", "iphone_x", "Artist1", "Notification"),
-                        RingtoneItem("Ringtone2", "ringtone2", "Artist2", "Notification")
+                        RingtoneItem("Classic Tone", "classic_tone", "ALIKHAN", "Ringtone"),
+                        RingtoneItem("Parasyte-Black Nail", "parasyte_black_nail_v2", "BAKANEE", "Ringtone"),
+                        RingtoneItem("Despacito", "despacito", "ZEDGE", "Ringtone"),
+                        RingtoneItem("Mafia", "mafia_ringtone", "Zilu", "Ringtone"),
+                        RingtoneItem("Rockstar", "rockstar", "Diablo", "Ringtone"),
+                        RingtoneItem("Kids - Stranger things", "kids_stranger_things", "Lucikitten", "Ringtone"),
+                        RingtoneItem("Old Phone Remix", "old_phone_remix", "Nathan", "Ringtone"),
+                        RingtoneItem("Nucleya", "nucleya_ringtone", "Ankitraaj", "Ringtone"),
+                        RingtoneItem("Zeus", "zeus_ringtone", "Gozmo2o", "Ringtone"),
+                        RingtoneItem("Office", "office_ring", "Unknown", "Ringtone"),
+                        RingtoneItem("Iphone Alarm", "iphone_alarm", "Apple", "Alarm"),
+                        RingtoneItem("Bling Bling", "iphone_message", "Apple", "Alarm"),
+                        RingtoneItem("Morning", "morning_alarm", "Unknown", "Alarm"),
+                        RingtoneItem("Tik Tok", "tik_tok_alarm", "Unknown", "Alarm"),
+                        RingtoneItem("Loud", "loud_alarm_sound", "Hardik", "Alarm"),
+                        RingtoneItem("Classic", "alarm_classic", "Dragos", "Alarm"),
+                        RingtoneItem("Emergency", "emergency", "Rcrumbley", "Alarm"),
+                        RingtoneItem("Extreme Clock", "extreme_alarm_clock", "ERlCA", "Alarm"),
+                        RingtoneItem("Fancy", "fansy", "Unknown", "Alarm"),
+                        RingtoneItem("Classic Birds", "classic_birds", "DarkObsessions", "Alarm"),
+                        RingtoneItem("Aurora", "aurora", "Smc Dev", "Notification"),
+                        RingtoneItem("Pookebool", "pookebool", "BShacklebolt", "Notification"),
+                        RingtoneItem("Pluck", "pluck", "Unknown", "Notification"),
+                        RingtoneItem("Ch ch", "ch_ch", "Susanaherr", "Notification"),
+                        RingtoneItem("Tono", "tono", "mxmxo", "Notification"),
+                        RingtoneItem("Samsung Pay", "samsung_pay", "Unknown", "Notification"),
+                        RingtoneItem("Oyoy", "oyoy", "Jatsuuu", "Notification"),
+                        RingtoneItem("2008", "ok_2008", "Unknown", "Notification"),
+                        RingtoneItem("Poing poing", "poing_poing", "Okade", "Notification"),
+                        RingtoneItem("Nokia 2007", "nokia_2007", "Unknown", "Notification")
                     )
 
                     val ringtones = ringtoneList.mapNotNull { ringtone ->
@@ -430,7 +424,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     }
 
     private fun clearSearchField() {
-        searchView.setQuery("", false) // Clear the query and do not submit it
+        searchView.setQuery("", false)
     }
 
     private fun collapseSearchView() {

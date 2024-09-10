@@ -26,12 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val intent = Intent(this, FragmentManagement::class.java).apply {
-            putExtra(FragmentManagement.NAV_ID, R.id.live_wallpapers)
-        }
-        startActivity(intent)
-
-        //setupClickListeners()
+        setupClickListeners()
     }
 
     private fun setupClickListeners() {
@@ -52,7 +47,5 @@ class MainActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
-
 
 }

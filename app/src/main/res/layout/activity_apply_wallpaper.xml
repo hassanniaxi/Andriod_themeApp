@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".wallpaper.Wallpaper"
     style="@style/backgrounds"
     android:orientation="horizontal"
     android:id="@+id/wallpaper">
@@ -41,12 +40,11 @@
         android:id="@+id/to_apply_wallpaper"
         android:layout_width="@dimen/_300sdp"
         android:layout_height="@dimen/_500sdp"
-        android:layout_gravity="center"
-        android:scaleType="centerInside"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:srcCompat="@drawable/wall_cover" />
+        app:srcCompat="@drawable/animal_8" />
 
     <Button
         android:id="@+id/apply__wallpaper_on"

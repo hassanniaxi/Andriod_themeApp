@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityWallpaperDetailBinding
 import com.example.myapplication.live_wallpapers.LiveWallpaperItems
+import com.example.myapplication.wallpaper.WallpaperDetailItems
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,17 +67,21 @@ class CatLiveWallpaperDetailActivity : AppCompatActivity() {
         spinner.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
     }
+
     private fun loadWallpaperImages(title: String?) {
         if (title == null) return
 
-        // Start by showing the spinner
         showSpinner()
         this?.let { nonNullContext ->
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val drawableMap = mapOf(
-                        "Sea View" to listOf("water"),
+                        "Fire" to listOf("wall_fire_cover", "wall_fire_1", "wall_fire_2", "wall_fire_3", "wall_fire_4", "wall_fire_5"),
+                        "Water" to listOf("wall_water_cover", "wall_water_1", "wall_water_2", "wall_water_3", "wall_water_4", "wall_water_5"),
+                        "Cars" to listOf("wall_car_cover", "wall_car_1", "wall_car_2", "wall_car_3", "wall_car_4", "wall_car_5"),
+                        "Aesthetic" to listOf("wall_aesthetic_cover", "wall_aesthetic_1", "wall_aesthetic_2", "wall_aesthetic_3", "wall_aesthetic_4", "wall_aesthetic_5"),
                     )
+
                     val drawableNames = drawableMap[title] ?: emptyList()
 
                     wallpaperDetailList.clear()
@@ -106,6 +111,7 @@ class CatLiveWallpaperDetailActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun updateNotFoundMessage() {
         notFoundTextView.text =  "Wallpapers not found"
         notFoundTextView.visibility = if (adapter.itemCount == 0) {

@@ -79,9 +79,6 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
         viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
         viewCatModel = ViewModelProvider(this).get(CatWallpaperViewModel::class.java)
 
-        FirebaseMessaging.getInstance().subscribeToTopic("wall")
-
-// Default setup
         initRecyclerViewForCat()
         if (wallpaperCatList.isEmpty()) {
             showSpinner()
@@ -106,8 +103,6 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
                 loadCatWallpapers()
             }
         }
-
-
 
         swipeRefreshLayout.setOnRefreshListener {
             loadAllWallpapers()

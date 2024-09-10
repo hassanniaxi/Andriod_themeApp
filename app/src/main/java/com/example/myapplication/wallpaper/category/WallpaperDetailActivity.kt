@@ -69,12 +69,10 @@ class WallpaperDetailActivity : AppCompatActivity() {
     private fun loadWallpaperImages(title: String?) {
         if (title == null) return
 
-        // Start by showing the spinner
         showSpinner()
         this?.let { nonNullContext ->
             CoroutineScope(Dispatchers.Main).launch {
                 try {
-                    // Map titles to drawable resource names
                     val drawableMap = mapOf(
                         "Flowers" to listOf("flower_cover", "flower_1", "flower_2", "flower_3", "flower_4", "flower_5", "flower_6", "flower_7", "flower_8", "flower_9", "flower_10"),
                         "Cars" to listOf("car_cover", "car_1", "car_2", "car_3", "car_4", "car_5", "car_6", "car_7", "car_8", "car_9", "car_10"),
@@ -87,7 +85,6 @@ class WallpaperDetailActivity : AppCompatActivity() {
                         "Fashion" to listOf("fashion_cover", "fashion_1", "fashion_2", "fashion_3", "fashion_4", "fashion_5", "fashion_6", "fashion_7", "fashion_8", "fashion_9", "fashion_10")
                     )
 
-                    // Get drawable names based on the title
                     val drawableNames = drawableMap[title] ?: emptyList()
 
                     wallpaperDetailList.clear()

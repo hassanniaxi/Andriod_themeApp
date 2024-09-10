@@ -81,10 +81,10 @@ class RingtoneDetailActivity : AppCompatActivity() {
                     }
                 }
             } ?: run {
-                finish() // Finish activity if no valid ringtone
+                finish()
             }
         } ?: run {
-            finish() // Finish activity if intent is null
+            finish()
         }
 
         if (savedInstanceState != null) {
@@ -212,31 +212,23 @@ class RingtoneDetailActivity : AppCompatActivity() {
             ringtoneUri.let { uri ->
                 lifecycleScope.launch {
                     showSpinner()
-                    binding.applyRingtoneOn.isEnabled = false
-                    binding.applyRingtoneOn.text = "Applying..."
 
                     withContext(Dispatchers.IO) {
                         RingtoneManager.setActualDefaultRingtoneUri(this@RingtoneDetailActivity, type, uri)
-
-                        // Verify if the ringtone was set correctly
                         val actualUri = RingtoneManager.getActualDefaultRingtoneUri(this@RingtoneDetailActivity, type)
                         if (actualUri != uri) {
                             throw Exception("Failed to set ringtone in system settings")
                         }
                     }
-
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@RingtoneDetailActivity, "Ringtone applied successfully", Toast.LENGTH_SHORT).show()
-                        binding.applyRingtoneOn.text = "Applied"
                     }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Failed to apply ringtone: ${e.message}", Toast.LENGTH_SHORT).show()
-            binding.applyRingtoneOn.text = "Apply"
         } finally {
-            binding.applyRingtoneOn.isEnabled = true
             hideSpinner()
         }
     }

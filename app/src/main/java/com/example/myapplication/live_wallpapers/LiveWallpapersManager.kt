@@ -219,27 +219,29 @@ class LiveWallpapersManager : Fragment(), GestureDetector.OnGestureListener{
 
     private fun loadAllWallpapers() {
         showSpinner()
-
         context?.let { nonNullContext ->
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val categoryWallpapers = listOf(
-                        LiveWallpaperItems("wall")
+                        "Fire" to listOf("wall_fire_cover", "wall_fire_1", "wall_fire_2", "wall_fire_3", "wall_fire_4", "wall_fire_5"),
+                        "Water" to listOf("wall_water_cover", "wall_water_1", "wall_water_2", "wall_water_3", "wall_water_4", "wall_water_5"),
+                        "Cars" to listOf("wall_car_cover", "wall_car_1", "wall_car_2", "wall_car_3", "wall_car_4", "wall_car_5"),
+                        "Aesthetic" to listOf("wall_aesthetic_cover", "wall_aesthetic_1", "wall_aesthetic_2", "wall_aesthetic_3", "wall_aesthetic_4", "wall_aesthetic_5"),
                     )
 
                     val allWallpapers = mutableListOf<LiveWallpaperItems>()
-                    for (wallpaper in categoryWallpapers) {
-                        try {
+                    categoryWallpapers.forEach { (categoryTitle, drawableNames) ->
+                        drawableNames.forEach { drawableName ->
                             val resourceId = nonNullContext.resources.getIdentifier(
-                                wallpaper.imageUrl,
+                                drawableName,
                                 "raw",
                                 nonNullContext.packageName
                             )
                             if (resourceId != 0) {
                                 allWallpapers.add(LiveWallpaperItems(resourceId.toString()))
+                            } else {
+                                Log.w("loadAllWallpapers", "Drawable not found: $drawableName")
                             }
-                        } catch (e: Exception) {
-                            Log.e("LoadWallpapers", "Error processing wallpaper: ${wallpaper.imageUrl}", e)
                         }
                     }
 
@@ -263,12 +265,16 @@ class LiveWallpapersManager : Fragment(), GestureDetector.OnGestureListener{
             hideSpinner()
         }
     }
+
     private fun loadCatWallpapers() {
         context?.let { nonNullContext ->
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val wallpaperList = listOf(
-                        CatWallpaperItem("Sea View", "wall"),
+                        CatWallpaperItem("Fire", "wall_fire_cover"),
+                        CatWallpaperItem("Water", "wall_water_cover"),
+                        CatWallpaperItem("Cars", "wall_car_cover"),
+                        CatWallpaperItem("Aesthetic", "wall_aesthetic_cover"),
                     )
 
                     val wallpapers = mutableListOf<CatLiveWallpaperItem>()

@@ -112,7 +112,7 @@
         <TextView
             android:id="@+id/all_filter"
             android:layout_width="0dp"
-            android:scaleX="1.07"
+            android:scaleX="1.099"
             android:scaleY="1.26"
             style="@style/filters"
             android:padding="@dimen/_2sdp"
@@ -125,7 +125,7 @@
         <TextView
             android:id="@+id/ringtone_filter"
             android:layout_width="0dp"
-            android:scaleX="1.099"
+            android:scaleX="1.054"
             android:scaleY="1.26"
             style="@style/filters"
             android:padding="@dimen/_2sdp"
@@ -138,7 +138,7 @@
         <TextView
             android:id="@+id/notification_filter"
             android:layout_width="0dp"
-            android:scaleX="1.099"
+            android:scaleX="1.05"
             android:scaleY="1.26"
             style="@style/filters"
             android:padding="@dimen/_2sdp"
