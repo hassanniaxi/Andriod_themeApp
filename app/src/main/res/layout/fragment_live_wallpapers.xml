@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/backgrounds"
-    tools:context=".live_wallpapers.LiveWallpapers"
-    android:id="@+id/live_wallpaper">
+    tools:context=".live_wallpapers.LiveWallpapersManager"
+    android:id="@+id/live_wallpapers">
 
     <TextView
         android:id="@+id/not_found_text_view2"
@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textColor="@color/gray"
+        android:text="@string/no_wallpaper_found"
         android:textStyle="normal"
         android:textAlignment="center"
         android:gravity="center"
@@ -22,6 +23,44 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/tab_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        <TextView
+            android:id="@+id/liveWallpaperCategory"
+            android:layout_width="0dp"
+            android:scaleX="1.04"
+            android:scaleY="1.24"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_filter_button_selected"
+            android:layout_weight="1"
+            android:padding="@dimen/_2sdp"
+            android:textAlignment="center"
+            android:text="@string/categories"
+            style="@style/filters" />
+
+        <TextView
+            android:id="@+id/allLiveWallpapers"
+            android:layout_width="0dp"
+            android:scaleX="1.04"
+            android:scaleY="1.24"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="@string/all_wallpapers"
+            style="@style/filters" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/spinner"
@@ -39,7 +78,7 @@
         android:layout_height="0dp"
         android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView3"
+        app:layout_constraintTop_toBottomOf="@id/tab_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

@@ -98,54 +98,69 @@
             android:layout_weight="1" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
     <LinearLayout
         android:id="@+id/filters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_6sdp"
-        android:background="@drawable/filters_background"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
         android:orientation="horizontal"
-        android:padding="@dimen/_3sdp"
+        android:background="@drawable/rounded_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3">
 
         <TextView
             android:id="@+id/all_filter"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:scaleX="1.07"
+            android:scaleY="1.26"
             style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_selected"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"
-            android:background="@color/yellow"
+            android:textAlignment="center"
             android:text="@string/all" />
 
         <TextView
             android:id="@+id/ringtone_filter"
-            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:scaleX="1.099"
+            android:scaleY="1.26"
             style="@style/filters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"
+            android:textAlignment="center"
             android:text="@string/ringtone" />
 
         <TextView
             android:id="@+id/notification_filter"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:scaleX="1.099"
+            android:scaleY="1.26"
             style="@style/filters"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"
+            android:textAlignment="center"
             android:text="@string/notification" />
 
         <TextView
             android:id="@+id/alarm_filter"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:scaleX="1.099"
+            android:scaleY="1.26"
             style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:textAlignment="center"
             android:text="@string/alarm" />
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="wrap_content"

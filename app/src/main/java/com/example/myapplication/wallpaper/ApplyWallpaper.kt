@@ -33,7 +33,6 @@ class ApplyWallpaper : AppCompatActivity() {
         setContentView(binding.root)
 
         bindingForLoading = OverlaySpinnerLayoutBinding.inflate(layoutInflater)
-// Add the overlay layout to the root of the main layout
         binding.root.addView(bindingForLoading.root)
 
 
@@ -41,7 +40,8 @@ class ApplyWallpaper : AppCompatActivity() {
             val applyingWallpaper = it.getStringExtra(APPLY_WALLPAPER)
             applyingWallpaper?.let { imageUrl ->
                 Glide.with(this)
-                    .load(imageUrl)
+                    .load(imageUrl.toInt())
+                    .placeholder(R.drawable.wallicon)
                     .error(R.drawable.baseline_error_outline_24)
                     .into(binding.toApplyWallpaper)
             }
@@ -111,18 +111,18 @@ class ApplyWallpaper : AppCompatActivity() {
 
         Glide.with(this)
             .asBitmap()
-            .load(imageUrl)
+            .load(imageUrl.toInt())
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
                     CoroutineScope(Dispatchers.IO).launch {
                         val wallpaperManager = WallpaperManager.getInstance(this@ApplyWallpaper)
                         try {
                             when (selectedOption) {
-                                0 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                                1 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
+                                0 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM)
+                                1 -> wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
                                 2 -> {
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM) // Home screen
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK) // Lock screen
+                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM)
+                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
                                 }
                                 else -> withContext(Dispatchers.Main) {
                                     Toast.makeText(this@ApplyWallpaper, "No option selected", Toast.LENGTH_SHORT).show()
@@ -135,7 +135,7 @@ class ApplyWallpaper : AppCompatActivity() {
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@ApplyWallpaper, "Failed to set wallpaper: ${e.message}", Toast.LENGTH_LONG).show()
-                                hideSpinner() // Ensure this is on the main thread
+                                hideSpinner()
                             }
                         }
                     }

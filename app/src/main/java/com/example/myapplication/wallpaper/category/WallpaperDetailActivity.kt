@@ -11,6 +11,9 @@ import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityWallpaperDetailBinding
 import com.example.myapplication.wallpaper.WallpaperDetailItems
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class WallpaperDetailActivity : AppCompatActivity() {
 
@@ -68,27 +71,52 @@ class WallpaperDetailActivity : AppCompatActivity() {
 
         // Start by showing the spinner
         showSpinner()
-        db.collection("wallpapers").document(title.replace(" ", "").lowercase()).collection("detail")
-            .get()
-            .addOnSuccessListener { subResult ->
-                wallpaperDetailList.clear()
-                for (subDocument in subResult) {
-                    val imageUrl = subDocument.getString("url") ?: ""
-                    wallpaperDetailList.add(WallpaperDetailItems(imageUrl))
+        this?.let { nonNullContext ->
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    // Map titles to drawable resource names
+                    val drawableMap = mapOf(
+                        "Flowers" to listOf("flower_cover", "flower_1", "flower_2", "flower_3", "flower_4", "flower_5", "flower_6", "flower_7", "flower_8", "flower_9", "flower_10"),
+                        "Cars" to listOf("car_cover", "car_1", "car_2", "car_3", "car_4", "car_5", "car_6", "car_7", "car_8", "car_9", "car_10"),
+                        "Nature" to listOf("nature_cover", "nature_1", "nature_2", "nature_3", "nature_4", "nature_5", "nature_6", "nature_7", "nature_8", "nature_9", "nature_10"),
+                        "Sunset" to listOf("sunset_cover", "sunset_1", "sunset_2", "sunset_3", "sunset_4", "sunset_5", "sunset_6", "sunset_7", "sunset_8", "sunset_9", "sunset_10"),
+                        "Vintage" to listOf("vintage_cover", "vintage_1", "vintage_2", "vintage_3", "vintage_4", "vintage_5", "vintage_6", "vintage_7", "vintage_8", "vintage_9", "vintage_10"),
+                        "Space" to listOf("space_cover", "space_1", "space_2", "space_3", "space_4", "space_5", "space_6", "space_7", "space_8", "space_9", "space_10"),
+                        "Animals" to listOf("animal_cover", "animal_1", "animal_2", "animal_3", "animal_4", "animal_5", "animal_6", "animal_7", "animal_8", "animal_9", "animal_10"),
+                        "Technology" to listOf("technology_cover", "technology_1", "technology_2", "technology_3", "technology_4", "technology_5", "technology_6", "technology_7", "technology_8", "technology_9", "technology_10"),
+                        "Fashion" to listOf("fashion_cover", "fashion_1", "fashion_2", "fashion_3", "fashion_4", "fashion_5", "fashion_6", "fashion_7", "fashion_8", "fashion_9", "fashion_10")
+                    )
+
+                    // Get drawable names based on the title
+                    val drawableNames = drawableMap[title] ?: emptyList()
+
+                    wallpaperDetailList.clear()
+                    drawableNames.forEach { drawableName ->
+                        val resourceId = nonNullContext.resources.getIdentifier(
+                            drawableName,
+                            "drawable",
+                            nonNullContext.packageName
+                        )
+                        if (resourceId != 0) {
+                            wallpaperDetailList.add(WallpaperDetailItems(resourceId.toString()))
+                        }
+                    }
+
+                    // Notify the adapter of data changes and update UI
+                    adapter.notifyDataSetChanged()
+                    hideSpinner()
+                    updateNotFoundMessage()
+                } catch (e: Exception) {
+                    hideSpinner()
+                    notFoundTextView.visibility = View.VISIBLE
+                    notFoundTextView.text = if (wallpaperDetailList.isEmpty()) {
+                        "Wallpapers not found"
+                    } else {
+                        "Error: ${e.message}"
+                    }
                 }
-                adapter.notifyDataSetChanged()
-                hideSpinner()
-                updateNotFoundMessage()
             }
-            .addOnFailureListener { exception ->
-                hideSpinner()
-                notFoundTextView.visibility = View.VISIBLE
-                notFoundTextView.text = if (wallpaperDetailList.isEmpty()) {
-                    "Wallpapers not found"
-                } else {
-                    "Error: ${exception.message}"
-                }
-            }
+        }
     }
 
     private fun updateNotFoundMessage() {

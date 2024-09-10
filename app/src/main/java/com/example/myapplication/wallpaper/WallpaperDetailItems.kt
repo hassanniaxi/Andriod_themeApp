@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class WallpaperDetailItems(
-    val imageUrl: String
+    val imageUrl: String= ""
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(

@@ -1,5 +1,6 @@
 package com.example.myapplication.wallpaper.category
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.view.GestureDetector
@@ -37,10 +38,12 @@ class CatWallpaperAdapter(
         return MyHolder(view)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val item = wallpaperList[position]
         holder.wallpaperTitle.text = item.title
-        Glide.with(context).load(item.imageUrl).error(R.drawable.baseline_error_outline_24).into(holder.wallpaperImage)
+
+        Glide.with(context).load(item.imageUrl.toInt()).placeholder(R.drawable.wallicon).error(R.drawable.baseline_error_outline_24).into(holder.wallpaperImage)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(context, WallpaperDetailActivity::class.java).apply {

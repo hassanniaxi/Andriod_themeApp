@@ -3,6 +3,7 @@ package com.example.myapplication.wallpaper
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -26,7 +28,10 @@ import com.example.myapplication.wallpaper.all.AllWallpaperViewModel
 import com.example.myapplication.wallpaper.category.CatWallpaperAdapter
 import com.example.myapplication.wallpaper.category.CatWallpaperItem
 import com.example.myapplication.wallpaper.category.CatWallpaperViewModel
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
@@ -38,7 +43,6 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
     private lateinit var viewCatModel: CatWallpaperViewModel
     private val wallpaperList = mutableListOf<WallpaperDetailItems>()
     private val wallpaperCatList = mutableListOf<CatWallpaperItem>()
-    private lateinit var db: FirebaseFirestore
     private lateinit var notFoundTextView: TextView
     private lateinit var spinner: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -75,17 +79,18 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
         viewModel = ViewModelProvider(this).get(AllWallpaperViewModel::class.java)
         viewCatModel = ViewModelProvider(this).get(CatWallpaperViewModel::class.java)
 
+        FirebaseMessaging.getInstance().subscribeToTopic("wall")
 
-        // default
+// Default setup
         initRecyclerViewForCat()
         if (wallpaperCatList.isEmpty()) {
             showSpinner()
             loadCatWallpapers()
         }
+        setFilterButtonState(binding.wallpaperCategory, binding.allWallpapers)
 
-        binding.allWallpapers.setOnClickListener{
-            binding.allWallpapers.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.wallpaperCategory.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.allWallpapers.setOnClickListener {
+            setFilterButtonState(binding.allWallpapers, binding.wallpaperCategory)
             initRecyclerView()
             if (wallpaperList.isEmpty()) {
                 showSpinner()
@@ -93,15 +98,16 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
             }
         }
 
-        binding.wallpaperCategory.setOnClickListener{
-            binding.wallpaperCategory.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.yellow))
-            binding.allWallpapers.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.defaultBackgroundColor))
+        binding.wallpaperCategory.setOnClickListener {
+            setFilterButtonState(binding.wallpaperCategory, binding.allWallpapers)
             initRecyclerViewForCat()
             if (wallpaperCatList.isEmpty()) {
                 showSpinner()
                 loadCatWallpapers()
             }
         }
+
+
 
         swipeRefreshLayout.setOnRefreshListener {
             loadAllWallpapers()
@@ -115,7 +121,35 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
             false
         }
 
+        toTransfer()
         return view
+    }
+    private  fun toTransfer(){
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val navController = findNavController()
+                    if (navController.currentDestination?.id == R.id.wallpapers) {
+                        requireActivity().finish()
+
+                    } else {
+                        // Default behavior: go back
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                    }
+                }
+            }
+        )
+    }
+
+    private fun setFilterButtonState(selectedButton: TextView, otherButton: TextView) {
+        val selectedDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_filter_button_selected)
+        val defaultDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_filter_button_default)
+        selectedButton.background = selectedDrawable
+        otherButton.background = defaultDrawable
+        selectedButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+        otherButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
     }
 
     private fun initRecyclerView() {
@@ -177,72 +211,113 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
     }
 
     private fun loadAllWallpapers() {
-        db = FirebaseFirestore.getInstance()
+        showSpinner()
+        context?.let { nonNullContext ->
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val categoryWallpapers = listOf(
+                        "Flowers" to listOf("flower_cover", "flower_1", "flower_2", "flower_3", "flower_4", "flower_5", "flower_6", "flower_7", "flower_8", "flower_9", "flower_10"),
+                        "Cars" to listOf("car_cover", "car_1", "car_2", "car_3", "car_4", "car_5", "car_6", "car_7", "car_8", "car_9", "car_10"),
+                        "Nature" to listOf("nature_cover", "nature_1", "nature_2", "nature_3", "nature_4", "nature_5", "nature_6", "nature_7", "nature_8", "nature_9", "nature_10"),
+                        "Sunset" to listOf("sunset_cover", "sunset_1", "sunset_2", "sunset_3", "sunset_4", "sunset_5", "sunset_6", "sunset_7", "sunset_8", "sunset_9", "sunset_10"),
+                        "Vintage" to listOf("vintage_cover", "vintage_1", "vintage_2", "vintage_3", "vintage_4", "vintage_5", "vintage_6", "vintage_7", "vintage_8", "vintage_9", "vintage_10"),
+                        "Space" to listOf("space_cover", "space_1", "space_2", "space_3", "space_4", "space_5", "space_6", "space_7", "space_8", "space_9", "space_10"),
+                        "Animals" to listOf("animal_cover", "animal_1", "animal_2", "animal_3", "animal_4", "animal_5", "animal_6", "animal_7", "animal_8", "animal_9", "animal_10"),
+                        "Technology" to listOf("technology_cover", "technology_1", "technology_2", "technology_3", "technology_4", "technology_5", "technology_6", "technology_7", "technology_8", "technology_9", "technology_10"),
+                        "Fashion" to listOf("fashion_cover", "fashion_1", "fashion_2", "fashion_3", "fashion_4", "fashion_5", "fashion_6", "fashion_7", "fashion_8", "fashion_9", "fashion_10")
+                    )
 
-        db.collection("wallpapers").get()
-            .addOnSuccessListener { result ->
-                val wallpapers = mutableListOf<WallpaperDetailItems>()
-
-                for (document in result) {
-                    val imageUrl = document.getString("Cover") ?: ""
-                    if (imageUrl.isNotEmpty()) {
-                        wallpapers.add(WallpaperDetailItems(imageUrl))
+                    val allWallpapers = mutableListOf<WallpaperDetailItems>()
+                    categoryWallpapers.forEach { (categoryTitle, drawableNames) ->
+                        drawableNames.forEach { drawableName ->
+                            val resourceId = nonNullContext.resources.getIdentifier(
+                                drawableName,
+                                "drawable",
+                                nonNullContext.packageName
+                            )
+                            if (resourceId != 0) {
+                                allWallpapers.add(WallpaperDetailItems(resourceId.toString()))
+                            } else {
+                                Log.w("loadAllWallpapers", "Drawable not found: $drawableName")
+                            }
+                        }
                     }
 
-                    // Fetch wallpapers from the sub-collection for each document
-                    db.collection("wallpapers").document(document.id).collection("detail")
-                        .get()
-                        .addOnSuccessListener { subResult ->
-                            for (subDocument in subResult) {
-                                val subImageUrl = subDocument.getString("url") ?: ""
-                                if (subImageUrl.isNotEmpty()) {
-                                    wallpapers.add(WallpaperDetailItems(subImageUrl))
-                                }
-                            }
-
-                            if (wallpapers.isEmpty()) {
-                                notFoundTextView.visibility = View.VISIBLE
-                            } else {
-                                viewModel.setWallpapers(wallpapers)
-                            }
-                            hideSpinner()
-                        }
-                        .addOnFailureListener { subException ->
-                            hideSpinner()
-                            notFoundTextView.visibility = View.VISIBLE
-                            notFoundTextView.text = "Error loading sub-collection: ${subException.message}"
-                        }
+                    if (allWallpapers.isEmpty()) {
+                        notFoundTextView.visibility = View.VISIBLE
+                        notFoundTextView.text = "No wallpapers found."
+                    } else {
+                        viewModel.setWallpapers(allWallpapers)
+                        notFoundTextView.visibility = View.GONE
+                    }
+                } catch (e: Exception) {
+                    notFoundTextView.visibility = View.VISIBLE
+                    notFoundTextView.text = "Error: ${e.message}"
+                } finally {
+                    hideSpinner()
                 }
             }
-            .addOnFailureListener { exception ->
-                hideSpinner()
-                notFoundTextView.visibility = View.VISIBLE
-                notFoundTextView.text = "Error: ${exception.message}"
-            }
+        } ?: run {
+            notFoundTextView.visibility = View.VISIBLE
+            notFoundTextView.text = "Error: Context is null."
+            hideSpinner()
+        }
     }
 
     private fun loadCatWallpapers() {
-        db = FirebaseFirestore.getInstance()
-        db.collection("wallpapers").get()
-            .addOnSuccessListener { result ->
-                val wallpapers = mutableListOf<CatWallpaperItem>()
-                for (document in result) {
-                    val title = document.getString("title") ?: "Unknown"
-                    val imageUrl = document.getString("Cover") ?: ""
-                    wallpapers.add(CatWallpaperItem(title, imageUrl))
-                }
-                viewCatModel.setWallpapers(wallpapers)
-                if (wallpapers.isEmpty()) {
-                    notFoundTextView.visibility = View.VISIBLE
-                }
-            }
-            .addOnFailureListener { exception ->
-                hideSpinner()
-                notFoundTextView.visibility = View.VISIBLE
-                notFoundTextView.text = "Error: ${exception.message}"
-            }
-    }
+        context?.let { nonNullContext ->
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val wallpaperList = listOf(
+                        CatWallpaperItem("Flowers", "flower_cover"),
+                        CatWallpaperItem("Cars", "car_cover"),
+                        CatWallpaperItem("Nature", "nature_cover"),
+                        CatWallpaperItem("Sunset", "sunset_cover"),
+                        CatWallpaperItem("Vintage", "vintage_cover"),
+                        CatWallpaperItem("Space", "space_cover"),
+                        CatWallpaperItem("Animals", "animal_cover"),
+                        CatWallpaperItem("Technology", "technology_cover"),
+                        CatWallpaperItem("Fashion", "fashion_cover"),
+                    )
 
+                    val wallpapers = mutableListOf<CatWallpaperItem>()
+
+                    for (wallpaper in wallpaperList) {
+                        try {
+                            val resourceId = nonNullContext.resources.getIdentifier(
+                                wallpaper.imageUrl,
+                                "drawable",
+                                nonNullContext.packageName
+                            )
+                            if (resourceId != 0) {
+                                wallpapers.add(CatWallpaperItem(wallpaper.title, resourceId.toString()))
+                            }
+                        } catch (e: Exception) {
+                            Log.e("LoadWallpapers", "Error processing wallpaper: ${wallpaper.imageUrl}", e)
+                        }
+                    }
+
+                    if (wallpapers.isEmpty()) {
+                        notFoundTextView.visibility = View.VISIBLE
+                        notFoundTextView.text = "No wallpapers found."
+                    } else {
+                        viewCatModel.setWallpapers(wallpapers)
+                        notFoundTextView.visibility = View.GONE
+                    }
+                } catch (e: Exception) {
+                    notFoundTextView.visibility = View.VISIBLE
+                    notFoundTextView.text = "Error: ${e.message}"
+                    Log.e("LoadWallpapers", "Error loading wallpapers", e)
+                } finally {
+                    hideSpinner()
+                }
+            }
+        } ?: run {
+            notFoundTextView.visibility = View.VISIBLE
+            notFoundTextView.text = "Error: Context is null."
+            hideSpinner()
+        }
+    }
 
     override fun onDown(e: MotionEvent): Boolean {
         x1 = e.x

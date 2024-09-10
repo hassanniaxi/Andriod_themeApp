@@ -1,4 +1,4 @@
-package com.example.myapplication.ringtone
+package com.example.walltone.ringtone
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,6 +15,8 @@ import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.NavigationHandler
 import com.example.myapplication.R
+import com.example.myapplication.ringtone.RingtoneDetailActivity
+import com.example.myapplication.ringtone.RingtoneItem
 import kotlin.math.abs
 
 class RingtoneAdapter(
@@ -47,7 +49,7 @@ class RingtoneAdapter(
         holder.authorTextView.text = ringtone.author
 
         holder.playRingtone.setOnClickListener {
-            navigateToDetailActivity(position-1)
+            navigateToDetailActivity(position)
         }
 
         holder.itemView.setOnTouchListener { _, event ->
@@ -120,7 +122,7 @@ class RingtoneAdapter(
         val deltaX = x2 - x1
         val deltaY = y2 - y1
         if (abs(deltaX) >MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
-            if (deltaX < 0) {
+            if (deltaX > 0) {
                 navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
             }
         }

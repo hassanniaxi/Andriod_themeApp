@@ -5,6 +5,7 @@
         <item name="colorPrimary">#3867d6</item>
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">#ffff</item>
+        <item name="fontFamily">@font/roboto_regular</item>
 
 
 
@@ -15,7 +16,6 @@
     </style>
 
     <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
-<!--        <item name="android:background">@drawable/rounded_button_background</item>-->
         <item name="android:textColor">#ffffff</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">15sp</item>
@@ -82,7 +82,6 @@
         <item name="android:layout_margin">@dimen/_3sdp</item>
         <item name="android:padding">@dimen/_3sdp</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">@dimen/_14ssp</item>
-
+        <item name="android:textSize">@dimen/_13ssp</item>
     </style>
 </resources>

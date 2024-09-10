@@ -25,7 +25,7 @@ class WallpaperDetailAdapter(
 
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val item = wallpaperDetailList[position]
-        Glide.with(context).load(item.imageUrl).error(com.example.myapplication.R.drawable.baseline_error_outline_24).into(holder.imageView)
+        Glide.with(context).load(item.imageUrl.toInt()).placeholder(R.drawable.wallicon).error(com.example.myapplication.R.drawable.baseline_error_outline_24).into(holder.imageView)
 
 
         holder.itemView.setOnClickListener {

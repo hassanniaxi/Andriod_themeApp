@@ -43,8 +43,9 @@ class AllWallpaperAdapter(
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val item = wallpaperList[position]
         Glide.with(context)
-            .load(item.imageUrl)
+            .load(item.imageUrl.toInt())
             .error(R.drawable.baseline_error_outline_24)
+            .placeholder(R.drawable.wallicon)
             .into(holder.wallpaperImage)
 
         holder.itemView.setOnTouchListener { _, event ->

@@ -1,15 +1,17 @@
 package com.example.myapplication.live_wallpapers
 
-import android.content.Context
-import android.graphics.Canvas
 import android.service.wallpaper.WallpaperService
 import android.view.SurfaceHolder
 import android.media.MediaPlayer
 import android.net.Uri
 import java.io.IOException
 
-
 class VideoWallpaperService : WallpaperService() {
+
+    companion object {
+        var videoUri: Uri? = null
+    }
+
     override fun onCreateEngine(): Engine {
         return VideoEngine()
     }
@@ -19,11 +21,13 @@ class VideoWallpaperService : WallpaperService() {
 
         override fun onSurfaceCreated(holder: SurfaceHolder) {
             super.onSurfaceCreated(holder)
+            updateMediaPlayer(holder)
+        }
 
-            val sharedPreferences = getSharedPreferences("live_wallpaper_prefs", Context.MODE_PRIVATE)
-            val videoPath = sharedPreferences.getString("video_path", null)
+        private fun updateMediaPlayer(holder: SurfaceHolder) {
+            mediaPlayer?.release() // Release previous mediaPlayer if exists
 
-            if (videoPath != null) {
+            videoUri?.let { uri ->
                 mediaPlayer = MediaPlayer().apply {
                     setOnPreparedListener { mp ->
                         mp.isLooping = true
@@ -34,15 +38,16 @@ class VideoWallpaperService : WallpaperService() {
                         false
                     }
                     try {
-                        setDataSource(applicationContext, Uri.parse(videoPath))
+                        setDataSource(applicationContext, uri)
                         setSurface(holder.surface)
                         prepareAsync()
                     } catch (e: IOException) {
                         // Handle exception
+                        e.printStackTrace()
                     }
                 }
-            } else {
-                stopSelf()
+            } ?: run {
+                stopSelf() // Stop the service if no URI is set
             }
         }
 

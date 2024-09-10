@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.firebase.messaging)
 
     // Testing dependencies
     testImplementation(libs.junit)
