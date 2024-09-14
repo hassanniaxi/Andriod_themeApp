@@ -35,9 +35,7 @@ import com.example.myapplication.NavigationHandler
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentRingtoneBinding
 import com.example.walltone.ringtone.RingtoneAdapter
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 import kotlin.math.abs
 
 class Ringtone : Fragment(), GestureDetector.OnGestureListener {

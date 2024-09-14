@@ -28,7 +28,6 @@ import com.example.myapplication.wallpaper.all.AllWallpaperViewModel
 import com.example.myapplication.wallpaper.category.CatWallpaperAdapter
 import com.example.myapplication.wallpaper.category.CatWallpaperItem
 import com.example.myapplication.wallpaper.category.CatWallpaperViewModel
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

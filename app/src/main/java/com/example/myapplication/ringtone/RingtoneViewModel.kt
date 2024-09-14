@@ -11,8 +11,4 @@ class RingtoneViewModel : ViewModel() {
     fun setRingtones(ringtones: List<RingtoneItem>) {
         _ringtones.value = ringtones
     }
-
-    fun hasLoadedRingtones(): Boolean {
-        return !(_ringtones.value.isNullOrEmpty())
-    }
 }
