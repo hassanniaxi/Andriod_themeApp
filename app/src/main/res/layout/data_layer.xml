@@ -8,6 +8,7 @@
     android:outlineSpotShadowColor="@color/blue"
     app:cardElevation="@dimen/_4sdp"
     app:cardBackgroundColor="@android:color/white"
+    app:layout_constraintWidth_default="wrap"
     android:layout_weight="1">
 
     <androidx.appcompat.widget.LinearLayoutCompat
