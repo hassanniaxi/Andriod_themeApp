@@ -49,4 +49,7 @@
     <string name="download">Download</string>
     <string name="categories">Categories</string>
     <string name="no_wallpaper_found">No Wallpaper Found</string>
+    <string name="icon_changer">Icon Changer</string>
+    <string name="save">Save</string>
+    <string name="please_choose_an_app">Please choose an app</string>
 </resources>

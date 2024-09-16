@@ -31,7 +31,7 @@
         android:theme="@style/Theme.MyApplication">
 
         <activity
-            android:name=".live_wallpapers.ApplyLiveWallpaper"
+            android:name=".icon_changer.MakeManipulation"
             android:exported="false" />
         <activity
             android:name=".FragmentManagement"
@@ -46,9 +46,6 @@
             android:name=".ringtone.RingtoneDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".live_wallpapers.catalog.CatLiveWallpaperDetailActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
@@ -57,34 +54,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".live_wallpapers.VideoWallpaperService"
-            android:exported="true"
-            android:permission="android.permission.BIND_WALLPAPER">
-            <intent-filter>
-                <action android:name="android.service.wallpaper.WallpaperService" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.wallpaper"
-                android:resource="@xml/video_wallpaper" />
-        </service>
-
-<!--        <service-->
-<!--            android:name=".java.MyFirebaseMessagingService"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/baseline_play_arrow_24" />
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/green" />
 
     </application>
 </manifest>

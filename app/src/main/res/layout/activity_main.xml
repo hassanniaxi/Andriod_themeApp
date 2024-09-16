@@ -27,7 +27,7 @@
             android:textSize="@dimen/_14ssp" />
 
         <Button
-            android:id="@+id/live_wall"
+            android:id="@+id/icon_changer"
             android:layout_width="@dimen/_250sdp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"

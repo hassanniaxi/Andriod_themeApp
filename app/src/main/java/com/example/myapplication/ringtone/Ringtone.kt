@@ -245,7 +245,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.live_wallpapers) }
+                navController?.let { NavigationHandler.navigateToDestination(it, R.id.icon_changer) }
             }
         }
 

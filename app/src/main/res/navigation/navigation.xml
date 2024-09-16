@@ -17,9 +17,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/live_wallpapers"
-        android:name="com.example.myapplication.live_wallpapers.LiveWallpapersManager"
-        android:label="Live Wallpapers">
+        android:id="@+id/icon_changer"
+        android:name="com.example.myapplication.icon_changer.IconChanger"
+        android:label="Icon Changer">
     </fragment>
 
 </navigation>

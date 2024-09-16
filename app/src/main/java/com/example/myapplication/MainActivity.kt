@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
         binding.ringtones.setOnClickListener {
             startFragmentManagementActivity(R.id.ringtones)
         }
-        binding.liveWall.setOnClickListener {
-            startFragmentManagementActivity(R.id.live_wallpapers)
+        binding.iconChanger.setOnClickListener {
+            startFragmentManagementActivity(R.id.icon_changer)
         }
         binding.allWallpapers.setOnClickListener {
             startFragmentManagementActivity(R.id.wallpapers)
