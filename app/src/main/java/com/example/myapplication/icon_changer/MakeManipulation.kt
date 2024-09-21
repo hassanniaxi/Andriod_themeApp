@@ -66,12 +66,26 @@ class MakeManipulation : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.editAppTitle.text.clear()
+    }
+
     private fun loadIcons() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val iconDetails = listOf(
-                    IconDetail("baseline_arrow_back_24"),
-                    IconDetail("ic_android_black_24dp"),
+                    IconDetail("icon_1"),
+                    IconDetail("icon_2"),
+                    IconDetail("icon_3"),
+                    IconDetail("icon_4"),
+                    IconDetail("icon_5"),
+                    IconDetail("icon_6"),
+                    IconDetail("icon_7"),
+                    IconDetail("icon_8"),
+                    IconDetail("icon_9"),
+                    IconDetail("icon_10"),
+                    IconDetail("icon_11"),
                 )
 
                 val icons = iconDetails.mapNotNull { icon ->

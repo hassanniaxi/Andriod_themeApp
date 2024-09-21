@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_20sdp"
             android:background="@drawable/rounded_button_background"
-            android:text="@string/live_wallpapers"
+            android:text="@string/icon_changer"
             android:textColor="@color/white"
             android:textSize="@dimen/_14ssp"
             />
@@ -47,16 +47,6 @@
             android:textColor="@color/white"
             android:textSize="@dimen/_14ssp" />
 
-<!--        <Button-->
-<!--            android:id="@+id/permission"-->
-<!--            android:layout_width="@dimen/_250sdp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/_20sdp"-->
-<!--            android:background="@drawable/rounded_button_background"-->
-<!--            android:text="Permission"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:onClick="requestPermission"-->
-<!--            android:textSize="@dimen/_14ssp" />-->
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

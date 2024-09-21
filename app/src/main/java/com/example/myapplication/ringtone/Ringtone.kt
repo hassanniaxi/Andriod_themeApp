@@ -70,7 +70,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentRingtoneBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -245,7 +245,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         val deltaY = y2 - y1
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
-                navController?.let { NavigationHandler.navigateToDestination(it, R.id.icon_changer) }
+                navController.let { NavigationHandler.navigateToDestination(it, R.id.icon_changer) }
             }
         }
 
@@ -380,7 +380,6 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 }
             }
         } ?: run {
-            // Handle null context case
             notFoundTextView.visibility = View.VISIBLE
             notFoundTextView.text = "Error: Context is null."
             hideSpinner()

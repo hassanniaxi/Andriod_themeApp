@@ -4,20 +4,21 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="8dp"
+    android:outlineSpotShadowColor="@color/blue"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/_60sdp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="8dp">
-
         <ImageView
             android:id="@+id/appIconImageView"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:src="@drawable/baseline_done_24"
             android:layout_gravity="center" />
 
         <TextView
@@ -25,10 +26,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="14sp"
+            android:textSize="@dimen/_8ssp"
+            android:text="check  "
             android:textAlignment="center"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:paddingTop="4dp" />
+            android:paddingTop="@dimen/_2sdp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

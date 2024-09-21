@@ -1,21 +1,10 @@
 package com.example.myapplication
 
-import android.content.ContentValues.TAG
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityMainBinding
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
-import android.view.View
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-
+import android.content.res.Configuration
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +35,10 @@ class MainActivity : AppCompatActivity() {
             putExtra(FragmentManagement.NAV_ID, navId)
         }
         startActivity(intent)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 
 }

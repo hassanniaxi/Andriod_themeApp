@@ -3,8 +3,11 @@ package com.example.myapplication.icon_changer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -85,51 +88,49 @@ class AppDetailAdapter(
     }
 
     private fun createShortcutForOtherApp(iconResourceId: Int?, newName: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Toast.makeText(context, "Shortcut creation is not supported on this device", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         try {
             val pm: PackageManager = context.packageManager
-            val shortcutManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.getSystemService(Context.SHORTCUT_SERVICE) as android.content.pm.ShortcutManager
-            } else {
-                null
+            val intent = pm.getLaunchIntentForPackage(pkgName)
+
+            if (intent == null) {
+                Toast.makeText(context, "Error: Launch intent for package not found", Toast.LENGTH_SHORT).show()
+                return
             }
 
-            val intent = pm.getLaunchIntentForPackage(pkgName)
-            if (intent != null) {
-                val shortcutIntent = Intent(Intent.ACTION_MAIN).apply {
-                    addCategory(Intent.CATEGORY_DEFAULT)
-                    component = intent.component
-                }
+            val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT).apply {
+                addCategory(Intent.CATEGORY_DEFAULT)
+                component = intent.component
+            }
 
-                val shortcutBuilder = ShortcutInfoCompat.Builder(context, pkgName)
-                    .setShortLabel(newName)
-                    .setLongLabel(newName)
-                    .setIntent(shortcutIntent)
+            val shortcutBuilder = ShortcutInfoCompat.Builder(context, pkgName)
+                .setShortLabel(newName)
+                .setLongLabel(newName)
+                .setIntent(shortcutIntent)
 
-                iconResourceId?.let {
-                    val icon = IconCompat.createWithResource(context, it)
-                    shortcutBuilder.setIcon(icon)
-                } ?: run {
-                    mainLogo?.let {
-                        val icon = IconCompat.createWithBitmap(it)
-                        shortcutBuilder.setIcon(icon)
-                    }
-                }
+            val icon = when {
+                iconResourceId != null -> IconCompat.createWithResource(context, iconResourceId)
+                mainLogo != null -> IconCompat.createWithBitmap(mainLogo)
+                else -> null
+            }
+            icon?.let { shortcutBuilder.setIcon(it) }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && shortcutManager != null) {
-                    val shortcut = shortcutBuilder.build()
-                    val success = ShortcutManagerCompat.requestPinShortcut(context, shortcut, null)
+            val shortcut = shortcutBuilder.build()
 
-                    if (success) {
-                        Toast.makeText(context, "Shortcut created successfully", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Shortcut creation failed", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    ShortcutManagerCompat.setDynamicShortcuts(context, listOf(shortcutBuilder.build()))
-                    Toast.makeText(context, "Shortcut added to launcher", Toast.LENGTH_SHORT).show()
-                }
+            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+            if (shortcutManager?.isRequestPinShortcutSupported == true) {
+                ShortcutManagerCompat.requestPinShortcut(context, shortcut, null)
+                ShortcutManagerCompat.setDynamicShortcuts(context, listOf(shortcut))
+                Toast.makeText(context, "Shortcut added to launcher", Toast.LENGTH_SHORT).show()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    context.startActivity(Intent(context, Success::class.java))
+                }, 3000)
             } else {
-                Toast.makeText(context, "Error: Launch intent for package not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Pinning shortcuts is not supported on this device", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             Toast.makeText(context, "Error: Unable to create shortcut", Toast.LENGTH_SHORT).show()
