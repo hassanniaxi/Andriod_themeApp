@@ -6,6 +6,7 @@
     android:layout_margin="8dp"
     android:outlineSpotShadowColor="@color/blue"
     app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/white"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -32,4 +33,5 @@
             android:ellipsize="end"
             android:paddingTop="@dimen/_2sdp" />
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

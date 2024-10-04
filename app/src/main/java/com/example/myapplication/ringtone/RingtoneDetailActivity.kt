@@ -1,8 +1,10 @@
 package com.example.myapplication.ringtone
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
@@ -20,8 +22,9 @@ import android.view.Window
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.annotation.RequiresApi
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
@@ -54,8 +57,17 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
     }
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.all { it.value }) {
+            showRingtoneBottomDialog()
+        } else {
+            Toast.makeText(this, "Permissions are required to apply ringtone", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     @SuppressLint("SetTextI18n")
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRingtoneDetailBinding.inflate(layoutInflater)
@@ -71,7 +83,6 @@ class RingtoneDetailActivity : AppCompatActivity() {
                 binding.ringtoneTitleTextView.text = ringtone.title
                 binding.ringtoneAuthorTextView.text = ringtone.author
                 ringtoneUri = Uri.parse("android.resource://${applicationContext.packageName}/${ringtone.resourceId}")
-
 
                 CoroutineScope(Dispatchers.IO).launch {
                     val fetchedDuration = getRingtoneDuration(ringtone.resourceId)
@@ -143,13 +154,12 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
 
         binding.applyRingtoneOn.setOnClickListener {
-                showRingtoneBottomDialog()
+            showRingtoneBottomDialog()
         }
 
         binding.playPauseRingtone.setOnClickListener {
             if (mediaPlayer?.isPlaying == true) pausePlayback() else resumePlayback()
         }
-
 
         binding.previousRingtone.setOnClickListener {
             playPreviousRingtone()
@@ -204,15 +214,42 @@ class RingtoneDetailActivity : AppCompatActivity() {
     }
 
     private fun applyRingtone(type: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(this)) {
-            requestWriteSettingsPermission()
-            return
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                val writeSettingsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_SETTINGS)
+                val accessNotificationPolicyPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY)
+
+                when {
+                    writeSettingsPermission == PackageManager.PERMISSION_GRANTED &&
+                            accessNotificationPolicyPermission == PackageManager.PERMISSION_GRANTED -> {
+                        performRingtoneSet(type)
+                    }
+                    else -> {
+                        requestPermissionLauncher.launch(arrayOf(
+                            Manifest.permission.WRITE_SETTINGS,
+                            Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                        ))
+                    }
+                }
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                if (Settings.System.canWrite(this)) {
+                    performRingtoneSet(type)
+                } else {
+                    requestWriteSettingsPermission()
+                }
+            }
+            else -> {
+                performRingtoneSet(type)
+            }
         }
+    }
+
+    private fun performRingtoneSet(type: Int) {
         try {
             ringtoneUri.let { uri ->
                 lifecycleScope.launch {
                     showSpinner()
-
                     withContext(Dispatchers.IO) {
                         RingtoneManager.setActualDefaultRingtoneUri(this@RingtoneDetailActivity, type, uri)
                         val actualUri = RingtoneManager.getActualDefaultRingtoneUri(this@RingtoneDetailActivity, type)
@@ -221,7 +258,11 @@ class RingtoneDetailActivity : AppCompatActivity() {
                         }
                     }
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@RingtoneDetailActivity, "Ringtone applied successfully", Toast.LENGTH_SHORT).show()
+                        when (type) {
+                            RingtoneManager.TYPE_NOTIFICATION -> Toast.makeText(this@RingtoneDetailActivity, "Notification applied successfully", Toast.LENGTH_SHORT).show()
+                            RingtoneManager.TYPE_ALARM -> Toast.makeText(this@RingtoneDetailActivity, "Alarm applied successfully", Toast.LENGTH_SHORT).show()
+                            else -> Toast.makeText(this@RingtoneDetailActivity, "Ringtone applied successfully", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -290,10 +331,8 @@ class RingtoneDetailActivity : AppCompatActivity() {
             binding.fullDurationTime.text = "Loading..."
             binding.completionLine.progress = 0
 
-            // Stop any ongoing playback
             stopPlayback()
 
-            // Play the new ringtone
             playRingtone(ringtone.resourceId)
         }
     }
@@ -306,7 +345,6 @@ class RingtoneDetailActivity : AppCompatActivity() {
             binding.fullDurationTime.text = "Loading..."
             binding.completionLine.progress = 0
 
-            // Play the new ringtone
             playRingtone(ringtone.resourceId)
         }
     }
@@ -351,35 +389,27 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("ObsoleteSdkInt")
+
     private fun requestWriteSettingsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(this)) {
-                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.data = Uri.parse("package:${packageName}")
-                startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
-            } else {
-                showRingtoneBottomDialog()
-            }
-        } else {
-            showRingtoneBottomDialog()
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            intent.data = Uri.parse("package:$packageName")
+            startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
         }
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
-            if (Settings.System.canWrite(this)) {
-                showRingtoneBottomDialog()
-            } else {
-                Toast.makeText(this, "Permission required to apply ringtone", Toast.LENGTH_SHORT).show()
+                override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
+                if (Settings.System.canWrite(this)) {
+                    showRingtoneBottomDialog()
+                } else {
+                    Toast.makeText(this, "Permission required to apply ringtone", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    }
 
-    companion object {
-        private const val REQUEST_CODE_WRITE_SETTINGS = 200
-        const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
-        const val EXTRA_PLAYING_POSITION = "extra_playing_position"
+                companion object {
+            private const val REQUEST_CODE_WRITE_SETTINGS = 200
+            const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
+            const val EXTRA_PLAYING_POSITION = "extra_playing_position"
+        }
     }
-}

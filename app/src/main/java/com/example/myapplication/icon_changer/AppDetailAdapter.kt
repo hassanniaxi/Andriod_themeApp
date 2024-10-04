@@ -5,9 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -15,12 +14,14 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.core.content.pm.ShortcutManagerCompat
 import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityMakeManipulationBinding
+import com.example.myapplication.ringtone.RingtoneDetailActivity
 
 class AppDetailAdapter(
     private val iconList: List<IconDetail>,
@@ -102,19 +103,30 @@ class AppDetailAdapter(
                 return
             }
 
-            val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT).apply {
-                addCategory(Intent.CATEGORY_DEFAULT)
-                component = intent.component
+            val targetAppContext = context.createPackageContext(pkgName, Context.CONTEXT_IGNORE_SECURITY)
+            val targetAppResources = targetAppContext.resources
+
+            val targetAppIcon = try {
+                val appInfo = pm.getApplicationInfo(pkgName, 0)
+                pm.getApplicationIcon(appInfo)
+            } catch (e: PackageManager.NameNotFoundException) {
+                null
             }
 
-            val shortcutBuilder = ShortcutInfoCompat.Builder(context, pkgName)
+            val shortcutIntent = Intent(Intent.ACTION_CREATE_SHORTCUT).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+                component = intent.component
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            }
+
+            val shortcutBuilder = ShortcutInfoCompat.Builder(context, "${pkgName}_${System.currentTimeMillis()}")
                 .setShortLabel(newName)
                 .setLongLabel(newName)
                 .setIntent(shortcutIntent)
 
             val icon = when {
                 iconResourceId != null -> IconCompat.createWithResource(context, iconResourceId)
-                mainLogo != null -> IconCompat.createWithBitmap(mainLogo)
+                targetAppIcon != null -> IconCompat.createWithBitmap((targetAppIcon as BitmapDrawable).bitmap)
                 else -> null
             }
             icon?.let { shortcutBuilder.setIcon(it) }
@@ -124,11 +136,11 @@ class AppDetailAdapter(
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             if (shortcutManager?.isRequestPinShortcutSupported == true) {
                 ShortcutManagerCompat.requestPinShortcut(context, shortcut, null)
-                ShortcutManagerCompat.setDynamicShortcuts(context, listOf(shortcut))
-                Toast.makeText(context, "Shortcut added to launcher", Toast.LENGTH_SHORT).show()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    context.startActivity(Intent(context, Success::class.java))
-                }, 3000)
+
+                val existingShortcuts = ShortcutManagerCompat.getDynamicShortcuts(context)
+                val updatedShortcuts = existingShortcuts.toMutableList()
+                updatedShortcuts.add(shortcut)
+                ShortcutManagerCompat.setDynamicShortcuts(context, updatedShortcuts)
             } else {
                 Toast.makeText(context, "Pinning shortcuts is not supported on this device", Toast.LENGTH_SHORT).show()
             }
@@ -137,6 +149,7 @@ class AppDetailAdapter(
             e.printStackTrace()
         }
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder {
         val view = LayoutInflater.from(parent.context)

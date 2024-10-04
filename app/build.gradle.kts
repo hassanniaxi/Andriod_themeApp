@@ -44,7 +44,6 @@ android {
 }
 
 dependencies {
-    // AndroidX and Kotlin dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -55,18 +54,14 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.recyclerview.selection)
 
-    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.google.firebase.database.ktx)
 
-    // Glide for image loading
     implementation(libs.glide)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.room.common)
     implementation(libs.firebase.database.v2020)
     implementation(libs.firebase.firestore.ktx)
-
-    implementation (libs.okhttp3.okhttp)
 
     implementation (libs.ssp.android)
     implementation (libs.sdp.android.v111)
@@ -81,8 +76,8 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.media3.ui)
     implementation(libs.firebase.messaging)
+    implementation(libs.core)
 
-    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

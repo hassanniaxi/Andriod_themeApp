@@ -33,10 +33,10 @@
     </style>
 
 
-    <!--   -->
     <style name="backgrounds">
         <item name="android:background">@color/white</item>
     </style>
+
 
     <style name="cards">
         <item name="android:background">@color/gray</item>
@@ -44,15 +44,11 @@
     </style>
 
     <style name="spinner">
-        <item name="android:background">@color/white</item>
         <item name="android:indeterminateTint">@color/black</item>
     </style>
 
     <style name="spinner_overlay">
-        <item name="android:background">@color/white</item>
-        <item name="android:statusBarColor">@color/white</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">@color/white</item>
+<!--        <item name="android:background">@color/white</item>-->
     </style>
 
 
@@ -68,9 +64,7 @@
         <item name="android:fillColor">@color/black</item>
     </style>
 
-    <style name="cardShadow">
-        <item name="android:outlineSpotShadowColor">@color/black</item>
-    </style>
+
 
     <style name="headers">
         <item name="android:textColor">@color/black</item>

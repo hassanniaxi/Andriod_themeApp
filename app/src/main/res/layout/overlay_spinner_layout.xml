@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         style="@style/spinner_overlay"
+        android:alpha="0.1"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

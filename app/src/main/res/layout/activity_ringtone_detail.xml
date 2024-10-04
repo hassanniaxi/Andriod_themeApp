@@ -42,8 +42,8 @@
         android:layout_margin="@dimen/_50sdp"
         app:cardCornerRadius="@dimen/_8sdp"
         app:cardElevation="@dimen/_8sdp"
-        style="@style/cardShadow"
         android:layout_weight="1"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3">
@@ -52,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            app:cardBackgroundColor="@color/white"
             android:layout_gravity="center"
             android:gravity="center"
             android:padding="@dimen/_4sdp">

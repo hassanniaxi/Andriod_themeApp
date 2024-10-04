@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.app.WallpaperManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -25,11 +26,12 @@ import com.example.myapplication.databinding.ActivityApplyWallpaperBinding
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
 import kotlinx.coroutines.*
 
+
 class ApplyWallpaper : AppCompatActivity() {
 
     private lateinit var binding: ActivityApplyWallpaperBinding
-    private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
     private lateinit var wallpaperUri: Uri
+    private lateinit var bindingForLoading: OverlaySpinnerLayoutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,25 +111,35 @@ class ApplyWallpaper : AppCompatActivity() {
         dialog.show()
     }
 
+
+
+
     private fun applyWallpaper(flags: Int) {
         showSpinner()
+
+        val wallpaperManager = WallpaperManager.getInstance(this@ApplyWallpaper)
 
         Glide.with(this)
             .asBitmap()
             .load(wallpaperUri)
+            .override(1080, 1920)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val wallpaperManager = WallpaperManager.getInstance(this@ApplyWallpaper)
                         try {
-                            when {
-                                flags and WallpaperManager.FLAG_SYSTEM != 0 -> {
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_SYSTEM)
+                            when (flags) {
+                                WallpaperManager.FLAG_SYSTEM -> {
+                                    wallpaperManager.setBitmap(resource)
                                 }
-                                flags and WallpaperManager.FLAG_LOCK != 0 -> {
+                                WallpaperManager.FLAG_LOCK -> {
+                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
+                                }
+                                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK -> {
+                                    wallpaperManager.setBitmap(resource)
                                     wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
                                 }
                             }
+
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@ApplyWallpaper, "Wallpaper set successfully", Toast.LENGTH_SHORT).show()
                             }

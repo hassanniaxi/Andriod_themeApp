@@ -7,6 +7,7 @@
     android:layout_margin="@dimen/_4sdp"
     app:cardCornerRadius="@dimen/_15sdp"
     app:cardElevation="@dimen/_5sdp"
+    app:cardBackgroundColor="@color/white"
     app:layout_constraintWidth_default="wrap"
     android:layout_weight="1"
     >
