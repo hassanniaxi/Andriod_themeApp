@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
 
     <application
         android:allowBackup="true"
@@ -14,7 +18,9 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/my_app_logo"
         android:label="@string/app_name"
-        android:roundIcon="@null"
+
+        tools:replace="android:icon"
+    android:roundIcon="@null"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity

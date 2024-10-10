@@ -14,6 +14,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
@@ -145,7 +146,7 @@ class AppDetailAdapter(
                 Toast.makeText(context, "Pinning shortcuts is not supported on this device", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "Error: Unable to create shortcut", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error: Please make changes", Toast.LENGTH_SHORT).show()
             e.printStackTrace()
         }
     }

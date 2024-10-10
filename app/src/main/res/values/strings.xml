@@ -53,7 +53,7 @@
     <string name="save">Save</string>
     <string name="please_choose_an_app">Please choose an app</string>
     <string name="no_app_found">No App Found</string>
-    <string name="cogratulations_successfully_added_to_home_screen">Cogratulations, successfully added to home screen</string>
+    <string name="successfully_added_to_home_screen">Successfully added to home screen !!!</string>
     <string name="go_to_home">Go to home</string>
     <string name="make_more">Make more</string>
     <string name="go_to_dashboard">Go to dashboard</string>

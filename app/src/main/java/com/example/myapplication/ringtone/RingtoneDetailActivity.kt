@@ -218,16 +218,23 @@ class RingtoneDetailActivity : AppCompatActivity() {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
                 val writeSettingsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_SETTINGS)
                 val accessNotificationPolicyPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NOTIFICATION_POLICY)
+                val postNotificationsPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    PackageManager.PERMISSION_GRANTED
+                }
 
                 when {
                     writeSettingsPermission == PackageManager.PERMISSION_GRANTED &&
-                            accessNotificationPolicyPermission == PackageManager.PERMISSION_GRANTED -> {
+                            accessNotificationPolicyPermission == PackageManager.PERMISSION_GRANTED &&
+                            postNotificationsPermission == PackageManager.PERMISSION_GRANTED -> {
                         performRingtoneSet(type)
                     }
                     else -> {
                         requestPermissionLauncher.launch(arrayOf(
                             Manifest.permission.WRITE_SETTINGS,
-                            Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                            Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+                            Manifest.permission.POST_NOTIFICATIONS
                         ))
                     }
                 }

@@ -66,10 +66,6 @@ class MakeManipulation : AppCompatActivity() {
         }
     }
 
-//    override fun onPause() {
-//        super.onPause()
-//        binding.editAppTitle.text.clear()
-//    }
 
     private fun loadIcons() {
         CoroutineScope(Dispatchers.IO).launch {

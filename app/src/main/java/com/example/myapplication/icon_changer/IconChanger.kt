@@ -1,26 +1,24 @@
 package com.example.myapplication.icon_changer
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.GestureDetector
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.LinearLayout
-import android.widget.SearchView
+import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.myapplication.NavigationHandler
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentIconChangerBinding
-import com.example.myapplication.ringtone.Ringtone
-import com.example.myapplication.ringtone.Ringtone.Companion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,13 +57,13 @@ class IconChanger : Fragment(), GestureDetector.OnGestureListener {
 
         binding.spinner.visibility = View.VISIBLE
 
-        binding.appSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        binding.appSearchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                binding.appSearchView.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.visibility = View.GONE
                 filterApps(newText)
                 return true
             }
@@ -78,23 +76,23 @@ class IconChanger : Fragment(), GestureDetector.OnGestureListener {
             }
             false
         }
+
         toTransfer()
 
         binding.appSearchView.setOnCloseListener {
             binding.appSearchView.clearFocus()
-           true
+            true
         }
 
         loadApps()
         return view
     }
 
-    private  fun toTransfer(){
+    private fun toTransfer() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val navController = findNavController()
                     if (navController.currentDestination?.id == R.id.icon_changer) {
                         requireActivity().finish()
                     } else {
@@ -109,24 +107,25 @@ class IconChanger : Fragment(), GestureDetector.OnGestureListener {
     private fun loadApps() {
         CoroutineScope(Dispatchers.IO).launch {
             val packageManager = requireContext().packageManager
-            val apps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
-            val visibleApps = apps.filter {
-                packageManager.getLaunchIntentForPackage(it.packageName) != null && it.enabled
+            val queryIntent = Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
             }
 
-            appList = visibleApps.map {
+            val resolveInfos = packageManager.queryIntentActivities(queryIntent, PackageManager.MATCH_ALL)
+
+            appList = resolveInfos.map { resolveInfo ->
                 AppInfo(
-                    appName = packageManager.getApplicationLabel(it).toString(),
-                    appIcon = packageManager.getApplicationIcon(it),
-                    packageName = it.packageName
+                    appName = resolveInfo.loadLabel(packageManager).toString(),
+                    appIcon = resolveInfo.loadIcon(packageManager),
+                    packageName = resolveInfo.activityInfo.packageName
                 )
             }
 
             filteredAppList = appList
 
             withContext(Dispatchers.Main) {
-                appAdapter = AppAdapter(filteredAppList, requireContext(),navController)
+                appAdapter = AppAdapter(filteredAppList, requireContext(), navController)
                 binding.recyclerView.apply {
                     layoutManager = GridLayoutManager(requireContext(), 4)
                     adapter = appAdapter
@@ -170,7 +169,7 @@ class IconChanger : Fragment(), GestureDetector.OnGestureListener {
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
                 navController.let { NavigationHandler.navigateToDestination(it, R.id.wallpapers) }
-            }else{
+            } else {
                 navController.let { NavigationHandler.navigateToDestination(it, R.id.ringtones) }
             }
         }
@@ -178,7 +177,6 @@ class IconChanger : Fragment(), GestureDetector.OnGestureListener {
         x1 = 0f
         y1 = 0f
     }
-
 
     override fun onDown(e: MotionEvent): Boolean {
         x1 = e.x
