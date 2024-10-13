@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/wallpapers">
+
+    <fragment
+        android:id="@+id/wallpapers"
+        android:name="com.example.myapplication.wallpaper.WallpapersManager"
+        android:label="Wallpapers">
+    </fragment>
+
+    <fragment
+        android:id="@+id/ringtones"
+        android:name="com.example.myapplication.ringtone.Ringtone"
+        android:label="Ringtones">
+    </fragment>
+
+    <fragment
+        android:id="@+id/icon_changer"
+        android:name="com.example.myapplication.icon_changer.IconChanger"
+        android:label="Icon Changer">
+    </fragment>
+
+</navigation>

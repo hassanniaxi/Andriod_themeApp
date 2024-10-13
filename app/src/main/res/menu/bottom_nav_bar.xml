@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/wallpapers"  android:icon="@drawable/wallicon" android:id="@+id/wallpapers" />
+    <item android:title="@string/icon_changer" android:icon="@drawable/icon_changer_logo" android:id="@+id/icon_changer"/>
+    <item android:title="@string/ringtones" android:icon="@drawable/ringtone_icon" android:id="@+id/ringtones" />
+</menu>

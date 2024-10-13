@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">Theme App</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="theme">Theme</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="welcome_to_home_page">Welcome to Home Page</string>
+    <string name="this_is_theme_page">This is Theme Page</string>
+    <string name="textview">TextView</string>
+    <string name="header_title">Header Title</string>
+    <string name="hi">Hi</string>
+
+
+    <string name="fragment_home_title">Home</string>
+    <string name="fragment_wallpaper_title">Wallpapers</string>
+    <string name="start">Start</string>
+    <string name="fragment_ringtone_title">Ringtone</string>
+    <string name="ringtone">Ringtone</string>
+    <string name="play_ringtone">Play ringtone</string>
+    <string name="no_ringtones_found">No ringtones found</string>
+    <string name="previous">Previous</string>
+    <string name="apply_ringtone">Apply Ringtone</string>
+    <string name="back">back</string>
+    <string name="apply">Apply</string>
+    <string name="set_on_wallpaper">Set on wallpaper</string>
+    <string name="home_screen">Home screen</string>
+    <string name="lock_screen">Lock screen</string>
+    <string name="home_and_lock_screens">Home and Lock screens</string>
+    <string name="wallpapers">Wallpapers</string>
+    <string name="set_on_ringtone">Set on ringtone</string>
+    <string name="alarm">Alarm</string>
+    <string name="notification">Notification</string>
+    <string name="phone">Phone</string>
+    <string name="all">All</string>
+    <string name="author">author</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort by</string>
+    <string name="alphabetical_z_a">Alphabetical (Z → A)</string>
+    <string name="alphabetical_a_z">Alphabetical (A → Z)</string>
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="artist">Artist</string>
+    <string name="live_wallpapers">Live Wallpapers</string>
+    <string name="ringtones">Ringtones</string>
+    <string name="wallpaper_category">Wallpaper Category</string>
+    <string name="all_wallpapers">All Wallpapers</string>
+    <string name="download">Download</string>
+    <string name="categories">Categories</string>
+    <string name="no_wallpaper_found">No Wallpaper Found</string>
+    <string name="icon_changer">Icon Changer</string>
+    <string name="save">Save</string>
+    <string name="please_choose_an_app">Please choose an app</string>
+    <string name="no_app_found">No App Found</string>
+    <string name="successfully_added_to_home_screen">Successfully added to home screen !!!</string>
+    <string name="go_to_home">Go to home</string>
+    <string name="make_more">Make more</string>
+    <string name="go_to_dashboard">Go to dashboard</string>
+</resources>

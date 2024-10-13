@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/backgrounds"
+    android:background="@drawable/dialogbg">
+
+    <ImageView
+        android:layout_width="@dimen/_70sdp"
+        android:layout_height="@dimen/_3sdp"
+        android:src="@drawable/baseline_remove_24"
+        android:layout_gravity="center|top"
+        android:scaleType="centerCrop"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/set_on"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="viewStart"
+            android:text="@string/set_on_ringtone"
+            android:padding="@dimen/_6sdp"
+            android:textStyle="bold"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:textSize="@dimen/_20ssp" />
+
+        <ImageView
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_26sdp"
+            android:src="@drawable/baseline_close_24"
+            android:layout_marginStart="@dimen/_110sdp"
+            android:layout_marginTop="@dimen/_7sdp"
+            android:textColor="@color/black"
+            android:id="@+id/cancelButton"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:id="@+id/setOnPhone"
+        android:padding="@dimen/_8sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="@string/phone"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/setOnAlarm"
+        android:padding="@dimen/_8sdp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="@string/alarm"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/setOnNotification"
+        android:paddingBottom="@dimen/_20sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:paddingRight="@dimen/_8sdp"
+        android:paddingLeft="@dimen/_8sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="@string/notification"
+             android:layout_marginStart="@dimen/_8sdp"
+            android:textSize="@dimen/_14ssp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

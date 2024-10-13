@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/backgrounds"
+    tools:context=".wallpaper.WallpapersManager"
+    android:id="@+id/wallpaper">
+
+    <TextView
+        android:id="@+id/not_found_text_view2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/gray"
+        android:textStyle="normal"
+        android:textAlignment="center"
+        android:text="@string/no_wallpaper_found"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/tab_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        <TextView
+            android:id="@+id/wallpaperCategory"
+            android:layout_width="0dp"
+            android:scaleX="1.04"
+            android:scaleY="1.29"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_filter_button_selected"
+            android:layout_weight="1"
+            android:padding="@dimen/_2sdp"
+            android:textAlignment="center"
+            android:text="@string/categories"
+            style="@style/filters" />
+
+        <TextView
+            android:id="@+id/allWallpapers"
+            android:layout_width="0dp"
+            android:scaleX="1.04"
+            android:scaleY="1.29"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="@string/all_wallpapers"
+            style="@style/filters" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/spinner"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/wallpaper_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wallpaper"
+        style="@style/headers"
+        android:layout_margin="@dimen/_12sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

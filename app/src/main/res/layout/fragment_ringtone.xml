@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/ringtone"
+    style="@style/backgrounds">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/ringtoneSearchView"
+        style="@style/actions"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search Ringtones"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="wrap"
+        android:visibility="gone"
+        />
+
+    <ImageButton
+        android:id="@+id/ringtoneSearchButton"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="40dp"
+        style="@style/actions"
+        android:layout_marginEnd="@dimen/_22sdp"
+        android:layout_marginTop="@dimen/_12sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_search_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/headers"
+        android:text="Ringtone"
+        android:layout_margin="@dimen/_12sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/not_found_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/no_ringtones_found"
+        android:textAlignment="center"
+        android:textColor="@color/gray"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        app:layout_constraintBaseline_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/spinner"
+        style="@style/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout_ringtone"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sort">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ringtone_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <LinearLayout
+        android:id="@+id/filters"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+        <TextView
+            android:id="@+id/all_filter"
+            android:layout_width="0dp"
+            android:scaleX="1.099"
+            android:scaleY="1.26"
+            style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_selected"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="@string/all" />
+
+        <TextView
+            android:id="@+id/ringtone_filter"
+            android:layout_width="0dp"
+            android:scaleX="1.054"
+            android:scaleY="1.26"
+            style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"
+            android:textAlignment="center"
+            android:text="@string/ringtone" />
+
+        <TextView
+            android:id="@+id/notification_filter"
+            android:layout_width="0dp"
+            android:scaleX="1.05"
+            android:scaleY="1.26"
+            style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1.3"
+            android:textAlignment="center"
+            android:text="@string/notification" />
+
+        <TextView
+            android:id="@+id/alarm_filter"
+            android:layout_width="0dp"
+            android:scaleX="1.099"
+            android:scaleY="1.26"
+            style="@style/filters"
+            android:padding="@dimen/_2sdp"
+            android:background="@drawable/rounded_filter_button_default"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:text="@string/alarm" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:padding="@dimen/_2sdp"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:id="@+id/sort"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filters">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sort_by"
+            android:id="@+id/sort_by"
+            style="@style/texts"
+            android:textSize="@dimen/_12sdp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/baseline_arrow_drop_down_24"
+            style="@style/actions"/>
+    </LinearLayout>
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/backgrounds"
+    android:orientation="horizontal"
+    android:id="@+id/wallpaper">
+
+    <include
+        android:id="@+id/overlay_spinner_layout"
+        layout="@layout/overlay_spinner_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_45sdp"
+        style="@style/headers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/back_to_wallpapers"
+        android:contentDescription="@string/back"
+        style="@style/actions"
+        android:layout_width="@dimen/_55sdp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:src="@drawable/baseline_arrow_back_24"
+        app:layout_constraintBottom_toBottomOf="@+id/textView3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/to_apply_wallpaper"
+        android:layout_width="@dimen/_300sdp"
+        android:layout_height="@dimen/_500sdp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:srcCompat="@drawable/animal_9" />
+
+    <Button
+        android:id="@+id/apply__wallpaper_on"
+        android:layout_width="@dimen/_300sdp"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:background="@drawable/rounded_button_background"
+        android:text="@string/apply"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14ssp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

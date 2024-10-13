@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/cards"
+    android:layout_width="@dimen/_40sdp"
+    android:layout_height="@dimen/_40sdp"
+    android:layout_margin="@dimen/_4sdp"
+    app:cardCornerRadius="@dimen/_15sdp"
+    app:cardElevation="@dimen/_5sdp"
+    app:cardBackgroundColor="@color/white"
+    app:layout_constraintWidth_default="wrap"
+    android:layout_weight="1"
+    >
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center">
+
+                <ImageView
+                    android:id="@+id/icons"
+                    android:layout_width="@dimen/_35sdp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"/>
+
+                <ImageView
+                    android:id="@+id/tick_mark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_done_24"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    app:tint="@color/blue" />
+
+        </RelativeLayout>
+
+
+
+</androidx.cardview.widget.CardView>
