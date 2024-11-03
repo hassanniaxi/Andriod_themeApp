@@ -122,21 +122,28 @@ class ApplyWallpaper : AppCompatActivity() {
         Glide.with(this)
             .asBitmap()
             .load(wallpaperUri)
-            .override(1080, 1920)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.Default) {
                         try {
+                            val display = windowManager.defaultDisplay
+                            val size = android.graphics.Point()
+                            display.getSize(size)
+                            val screenWidth = size.x
+                            val screenHeight = size.y
+
+                            val resizedBitmap = Bitmap.createScaledBitmap(resource, screenWidth, screenHeight, true)
+
                             when (flags) {
                                 WallpaperManager.FLAG_SYSTEM -> {
-                                    wallpaperManager.setBitmap(resource)
+                                    wallpaperManager.setBitmap(resizedBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
                                 }
                                 WallpaperManager.FLAG_LOCK -> {
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
+                                    wallpaperManager.setBitmap(resizedBitmap, null, true, WallpaperManager.FLAG_LOCK)
                                 }
                                 WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK -> {
-                                    wallpaperManager.setBitmap(resource)
-                                    wallpaperManager.setBitmap(resource, null, true, WallpaperManager.FLAG_LOCK)
+                                    wallpaperManager.setBitmap(resizedBitmap, null, true, WallpaperManager.FLAG_SYSTEM)
+                                    wallpaperManager.setBitmap(resizedBitmap, null, true, WallpaperManager.FLAG_LOCK)
                                 }
                             }
 
@@ -160,7 +167,6 @@ class ApplyWallpaper : AppCompatActivity() {
                 }
             })
     }
-
     companion object {
         const val APPLY_WALLPAPER = "apply_wallpaper"
     }

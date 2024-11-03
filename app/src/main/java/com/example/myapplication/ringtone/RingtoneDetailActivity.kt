@@ -3,6 +3,7 @@ package com.example.myapplication.ringtone
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -12,8 +13,10 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
@@ -31,6 +34,11 @@ import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityRingtoneDetailBinding
 import com.example.myapplication.databinding.OverlaySpinnerLayoutBinding
 import kotlinx.coroutines.*
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 
 class RingtoneDetailActivity : AppCompatActivity() {
 
@@ -252,32 +260,90 @@ class RingtoneDetailActivity : AppCompatActivity() {
         }
     }
 
+
     private fun performRingtoneSet(type: Int) {
         try {
-            ringtoneUri.let { uri ->
-                lifecycleScope.launch {
-                    showSpinner()
-                    withContext(Dispatchers.IO) {
-                        RingtoneManager.setActualDefaultRingtoneUri(this@RingtoneDetailActivity, type, uri)
-                        val actualUri = RingtoneManager.getActualDefaultRingtoneUri(this@RingtoneDetailActivity, type)
-                        if (actualUri != uri) {
-                            throw Exception("Failed to set ringtone in system settings")
-                        }
-                    }
-                    withContext(Dispatchers.Main) {
-                        when (type) {
-                            RingtoneManager.TYPE_NOTIFICATION -> Toast.makeText(this@RingtoneDetailActivity, "Notification applied successfully", Toast.LENGTH_SHORT).show()
-                            RingtoneManager.TYPE_ALARM -> Toast.makeText(this@RingtoneDetailActivity, "Alarm applied successfully", Toast.LENGTH_SHORT).show()
-                            else -> Toast.makeText(this@RingtoneDetailActivity, "Ringtone applied successfully", Toast.LENGTH_SHORT).show()
-                        }
+            // Assuming ringtoneList[currentlyPlayingPosition].resourceId is a String that holds the resource name.
+            val resourceName = ringtoneList[currentlyPlayingPosition].resourceId
+            val rawResourceId = resources.getIdentifier(resourceName, "raw", packageName)
+
+            val values = ContentValues()
+            val ringtoneType: Int
+            val toastMSG: String
+
+            when (type) {
+                RingtoneManager.TYPE_RINGTONE -> {
+                    toastMSG = "Ringtone is set"
+                    values.put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                    ringtoneType = RingtoneManager.TYPE_RINGTONE
+                }
+                RingtoneManager.TYPE_NOTIFICATION -> {
+                    toastMSG = "Notification Tone is set"
+                    values.put(MediaStore.Audio.Media.IS_NOTIFICATION, true)
+                    ringtoneType = RingtoneManager.TYPE_NOTIFICATION
+                }
+                RingtoneManager.TYPE_ALARM -> {
+                    toastMSG = "Alarm tone is set"
+                    values.put(MediaStore.Audio.Media.IS_ALARM, true)
+                    ringtoneType = RingtoneManager.TYPE_ALARM
+                }
+                else -> {
+                    toastMSG = "Ringtone is set"
+                    values.put(MediaStore.Audio.Media.IS_RINGTONE, true)
+                    ringtoneType = RingtoneManager.TYPE_RINGTONE
+                }
+            }
+
+            val ringtoneFile = File(getExternalFilesDir(Environment.DIRECTORY_MUSIC), "$resourceName.mp3")
+            val inputStream = resources.openRawResource(rawResourceId)
+            val outputStream = FileOutputStream(ringtoneFile)
+
+            inputStream.use { input ->
+                outputStream.use { output ->
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    while (input.read(buffer).also { length = it } > 0) {
+                        output.write(buffer, 0, length)
                     }
                 }
             }
+
+            values.apply {
+                put(MediaStore.MediaColumns.TITLE, resourceName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp3")
+                put(MediaStore.MediaColumns.SIZE, ringtoneFile.length())
+                put(MediaStore.Audio.Media.IS_MUSIC, false)
+            }
+
+            val newUri: Uri?
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, ringtoneFile.name)
+                newUri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values)
+
+                newUri?.let {
+                    contentResolver.openOutputStream(it).use { os ->
+                        val bytes = ByteArray(ringtoneFile.length().toInt())
+                        BufferedInputStream(FileInputStream(ringtoneFile)).use { buf ->
+                            buf.read(bytes)
+                            os?.write(bytes)
+                        }
+                    }
+                    RingtoneManager.setActualDefaultRingtoneUri(this, ringtoneType, it)
+                }
+            } else {
+                values.put(MediaStore.MediaColumns.DATA, ringtoneFile.absolutePath)
+                val uri = MediaStore.Audio.Media.getContentUriForPath(ringtoneFile.absolutePath)
+
+                contentResolver.delete(uri!!, "${MediaStore.MediaColumns.DATA}=\"${ringtoneFile.absolutePath}\"", null)
+                newUri = contentResolver.insert(uri, values)
+
+                RingtoneManager.setActualDefaultRingtoneUri(this, ringtoneType, newUri)
+                contentResolver.insert(MediaStore.Audio.Media.getContentUriForPath(ringtoneFile.absolutePath)!!, values)
+            }
+
+            Toast.makeText(this, toastMSG, Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Failed to apply ringtone: ${e.message}", Toast.LENGTH_SHORT).show()
-        } finally {
-            hideSpinner()
         }
     }
 
@@ -398,25 +464,25 @@ class RingtoneDetailActivity : AppCompatActivity() {
 
 
     private fun requestWriteSettingsPermission() {
-            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-            intent.data = Uri.parse("package:$packageName")
-            startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
-        }
+        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+        intent.data = Uri.parse("package:$packageName")
+        startActivityForResult(intent, REQUEST_CODE_WRITE_SETTINGS)
+    }
 
-                override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            super.onActivityResult(requestCode, resultCode, data)
-            if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
-                if (Settings.System.canWrite(this)) {
-                    showRingtoneBottomDialog()
-                } else {
-                    Toast.makeText(this, "Permission required to apply ringtone", Toast.LENGTH_SHORT).show()
-                }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_WRITE_SETTINGS) {
+            if (Settings.System.canWrite(this)) {
+                showRingtoneBottomDialog()
+            } else {
+                Toast.makeText(this, "Permission required to apply ringtone", Toast.LENGTH_SHORT).show()
             }
         }
-
-                companion object {
-            private const val REQUEST_CODE_WRITE_SETTINGS = 200
-            const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
-            const val EXTRA_PLAYING_POSITION = "extra_playing_position"
-        }
     }
+
+    companion object {
+        private const val REQUEST_CODE_WRITE_SETTINGS = 200
+        const val EXTRA_RINGTONE_LIST = "extra_ringtone_list"
+        const val EXTRA_PLAYING_POSITION = "extra_playing_position"
+    }
+}

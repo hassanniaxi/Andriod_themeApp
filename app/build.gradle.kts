@@ -1,8 +1,7 @@
-// File: build.gradle.kts (App-level)
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.gms.google-services") // Apply the Google services plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -21,7 +20,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

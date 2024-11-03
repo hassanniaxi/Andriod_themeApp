@@ -25,7 +25,7 @@
             android:layout_height="@dimen/_150sdp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/wall_cover" />
+            app:srcCompat="@drawable/s24_cover" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

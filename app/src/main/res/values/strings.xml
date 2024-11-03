@@ -57,4 +57,8 @@
     <string name="go_to_home">Go to home</string>
     <string name="make_more">Make more</string>
     <string name="go_to_dashboard">Go to dashboard</string>
+    <string name="preview">Preview</string>
+    <string name="_200_items">200 Items</string>
+    <string name="explore_the_features">Explore the Features</string>
+    <string name="s25_ultra_launcher">S25 Ultra Launcher</string>
 </resources>

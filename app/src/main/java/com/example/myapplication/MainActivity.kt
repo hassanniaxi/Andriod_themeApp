@@ -28,6 +28,15 @@ class MainActivity : AppCompatActivity() {
         binding.allWallpapers.setOnClickListener {
             startFragmentManagementActivity(R.id.wallpapers)
         }
+        binding.preview.setOnClickListener {
+            startFragmentManagementActivity(R.id.preview)
+        }
+        binding.catWallpapers.setOnClickListener {
+            startFragmentManagementActivity(R.id.wallpapers)
+        }
+        binding.rateUs.setOnClickListener {
+            // write your code here
+        }
     }
 
     private fun startFragmentManagementActivity(navId: Int) {

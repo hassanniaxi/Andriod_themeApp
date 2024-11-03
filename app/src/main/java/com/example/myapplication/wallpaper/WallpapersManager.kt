@@ -209,13 +209,10 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val categoryWallpapers = listOf(
-                        "Flowers" to listOf("flower_cover", "flower_1",  "flower_3", "flower_4", "flower_5", "flower_6", "flower_7", "flower_8", "flower_9", "flower_10"),
-                        "Cars" to listOf("car_cover", "car_1", "car_2", "car_3", "car_6", "car_7", "car_8", "car_9", "car_10"),
-                        "Nature" to listOf("nature_cover", "nature_1", "nature_2", "nature_3",  "nature_10"),
-                        "Vintage" to listOf("vintage_cover", "vintage_1", "vintage_2", "vintage_3", "vintage_4", "vintage_6", "vintage_7", "vintage_8"),
-                        "Space" to listOf("space_cover",  "space_4",  "space_7", "space_8", "space_9", "space_10"),
-                        "Animals" to listOf("animal_cover", "animal_1", "animal_3",  "animal_5", "animal_7", "animal_9", "animal_10"),
-                        "Fashion" to listOf("fashion_cover", "fashion_1", "fashion_3", "fashion_4", "fashion_5", "fashion_6", "fashion_7", "fashion_8", "fashion_9", "fashion_10")
+                        "S24" to listOf("s24_cover", "s24_1",  "s24_2","s24_3", "s24_4", "s24_5", "s24_6", "s24_7", "s24_8", "s24_9"),
+                        "S25" to listOf("s25_cover", "s25_1",  "s25_2","s25_3", "s25_4", "s25_5", "s25_6", "s25_7", "s25_8", "s25_9"),
+                        "S25 Ultra" to listOf("s25_ultra_cover", "s25_ultra_1",  "s25_ultra_2","s25_ultra_3", "s25_ultra_4", "s25_ultra_5", "s25_ultra_6", "s25_ultra_7", "s25_ultra_8", "s25_ultra_9"),
+                        "Colors" to listOf("colors_cover", "colors_1",  "colors_2","colors_3", "colors_4", "colors_5", "colors_6", "colors_7", "colors_8", "colors_9"),
                     )
 
                     val allWallpapers = mutableListOf<WallpaperDetailItems>()
@@ -260,13 +257,10 @@ class WallpapersManager : Fragment(), GestureDetector.OnGestureListener{
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val wallpaperList = listOf(
-                        CatWallpaperItem("Flowers", "flower_cover"),
-                        CatWallpaperItem("Cars", "car_cover"),
-                        CatWallpaperItem("Nature", "nature_cover"),
-                        CatWallpaperItem("Vintage", "vintage_cover"),
-                        CatWallpaperItem("Space", "space_cover"),
-                        CatWallpaperItem("Animals", "animal_cover"),
-                        CatWallpaperItem("Fashion", "fashion_cover"),
+                        CatWallpaperItem("S24", "s24_cover"),
+                        CatWallpaperItem("S25", "s25_cover"),
+                        CatWallpaperItem("S25 Ultra", "s25_ultra_cover"),
+                        CatWallpaperItem("Colors", "colors_cover"),
                     )
 
                     val wallpapers = mutableListOf<CatWallpaperItem>()

@@ -219,12 +219,16 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         adapter.notifyDataSetChanged()
     }
 
+    private fun updateItemCount() {
+        binding.items.text = "${ringtoneList.size} items"
+    }
 
     private fun sortRingtones(ascending: Boolean = true) {
         ringtoneList.sortWith { item1, item2 ->
             val comparison = item1.title.compareTo(item2.title, ignoreCase = true)
             if (ascending) comparison else -comparison
         }
+        updateItemCount()
         adapter.notifyDataSetChanged()
     }
 
@@ -246,6 +250,8 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
         if (abs(deltaX) > MINI_DISTANCE && abs(deltaY) < MINI_DISTANCE) {
             if (deltaX > 0) {
                 navController.let { NavigationHandler.navigateToDestination(it, R.id.icon_changer) }
+            }else{
+                navController.let { NavigationHandler.navigateToDestination(it, R.id.preview) }
             }
         }
 
@@ -259,21 +265,25 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                 setFilterButtonState(binding.allFilter, binding.alarmFilter,binding.ringtoneFilter,binding.notificationFilter)
                 currentFilter = 1
                 filterRingtones(1)
+                updateItemCount()
             }
             2 -> {
                 setFilterButtonState(binding.ringtoneFilter, binding.alarmFilter,binding.allFilter,binding.notificationFilter)
                 currentFilter = 2
                 filterRingtones(2)
+                updateItemCount()
             }
             3 -> {
                 setFilterButtonState(binding.notificationFilter, binding.alarmFilter,binding.ringtoneFilter,binding.allFilter)
                 currentFilter = 3
                 filterRingtones(3)
+                updateItemCount()
             }
             4 -> {
                 setFilterButtonState(binding.alarmFilter,binding.allFilter, binding.ringtoneFilter,binding.notificationFilter)
                 currentFilter = 4
                 filterRingtones(4)
+                updateItemCount()
             }
         }
     }
@@ -315,6 +325,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             }
 
             adapter.notifyDataSetChanged()
+            updateItemCount()
             updateNotFoundMessage(filteredList.isEmpty())
         }
     }
@@ -324,37 +335,24 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val ringtoneList = listOf(
-                        RingtoneItem("Iphone X", "iphone_x", "Apple", "Ringtone"),
-                        RingtoneItem("Classic Tone", "classic_tone", "ALIKHAN", "Ringtone"),
-                        RingtoneItem("Parasyte-Black Nail", "parasyte_black_nail_v2", "BAKANEE", "Ringtone"),
-                        RingtoneItem("Despacito", "despacito", "ZEDGE", "Ringtone"),
-                        RingtoneItem("Mafia", "mafia_ringtone", "Zilu", "Ringtone"),
-                        RingtoneItem("Rockstar", "rockstar", "Diablo", "Ringtone"),
-                        RingtoneItem("Kids - Stranger things", "kids_stranger_things", "Lucikitten", "Ringtone"),
-                        RingtoneItem("Old Phone Remix", "old_phone_remix", "Nathan", "Ringtone"),
-                        RingtoneItem("Nucleya", "nucleya_ringtone", "Ankitraaj", "Ringtone"),
-                        RingtoneItem("Zeus", "zeus_ringtone", "Gozmo2o", "Ringtone"),
-                        RingtoneItem("Office", "office_ring", "Unknown", "Ringtone"),
-                        RingtoneItem("Iphone Alarm", "iphone_alarm", "Apple", "Alarm"),
-                        RingtoneItem("Bling Bling", "iphone_message", "Apple", "Alarm"),
-                        RingtoneItem("Morning", "morning_alarm", "Unknown", "Alarm"),
-                        RingtoneItem("Tik Tok", "tik_tok_alarm", "Unknown", "Alarm"),
-                        RingtoneItem("Loud", "loud_alarm_sound", "Hardik", "Alarm"),
-                        RingtoneItem("Classic", "alarm_classic", "Dragos", "Alarm"),
-                        RingtoneItem("Emergency", "emergency", "Rcrumbley", "Alarm"),
-                        RingtoneItem("Extreme Clock", "extreme_alarm_clock", "ERlCA", "Alarm"),
-                        RingtoneItem("Fancy", "fansy", "Unknown", "Alarm"),
-                        RingtoneItem("Classic Birds", "classic_birds", "DarkObsessions", "Alarm"),
-                        RingtoneItem("Aurora", "aurora", "Smc Dev", "Notification"),
-                        RingtoneItem("Pookebool", "pookebool", "BShacklebolt", "Notification"),
-                        RingtoneItem("Pluck", "pluck", "Unknown", "Notification"),
-                        RingtoneItem("Ch ch", "ch_ch", "Susanaherr", "Notification"),
-                        RingtoneItem("Tono", "tono", "mxmxo", "Notification"),
-                        RingtoneItem("Samsung Pay", "samsung_pay", "Unknown", "Notification"),
-                        RingtoneItem("Oyoy", "oyoy", "Jatsuuu", "Notification"),
-                        RingtoneItem("2008", "ok_2008", "Unknown", "Notification"),
-                        RingtoneItem("Poing poing", "poing_poing", "Okade", "Notification"),
-                        RingtoneItem("Nokia 2007", "nokia_2007", "Unknown", "Notification")
+                        RingtoneItem("G4 Notification", "g4_notification", "Unknown", "Notification"),
+                        RingtoneItem("On Time", "on_time", "Unknown", "Notification"),
+                        RingtoneItem("Samsung", "samsung", "Samsung", "Notification"),
+                        RingtoneItem("Samsung", "samsung_whistle", "Samsung", "Notification"),
+                        RingtoneItem("Skyline", "skyline", "Samsung", "Notification"),
+                        RingtoneItem("Ticktac", "ticktac_alarm", "Unknown", "Alarm"),
+                        RingtoneItem("A Toy Watch", "a_toy_watch", "Unknown", "Notification"),
+                        RingtoneItem("Cloudy Tone", "cloudy_tone", "Unknown", "Ringtone"),
+                        RingtoneItem("Galaxy", "galaxy_alarm", "Samsung", "Alarm"),
+                        RingtoneItem("Good Morning", "goog_morning", "Unknown", "Alarm"),
+                        RingtoneItem("Samsung Galaxy Alarm", "samsung_galaxy_alarm", "Samsung", "Alarm"),
+                        RingtoneItem("Orbit", "orbit", "Unknown", "Ringtone"),
+                        RingtoneItem("Over The Horizon", "over_the_horizon", "Samsung", "Ringtone"),
+                        RingtoneItem("Polaris", "polaris", "Unknown", "Alarm"),
+                        RingtoneItem("Quantum Bell", "quantum_bell", "Unknown", "Alarm"),
+                        RingtoneItem("Snake Hips", "snake_hips", "Unknown", "Alarm"),
+                        RingtoneItem("Bling Op", "bling_op", "Unknown", "Ringtone"),
+                        RingtoneItem("Neptune", "neptune", "Unknown", "Ringtone"),
                     )
 
                     val ringtones = ringtoneList.mapNotNull { ringtone ->
@@ -369,6 +367,7 @@ class Ringtone : Fragment(), GestureDetector.OnGestureListener {
                     withContext(Dispatchers.Main) {
                         viewModel.setRingtones(ringtones)
                         filterRingtones(currentFilter)
+                        updateItemCount()
                         hideSpinner()
                     }
                 } catch (e: Exception) {

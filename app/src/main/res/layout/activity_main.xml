@@ -1,51 +1,168 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/backgrounds">
+    android:background="@color/white"
+    tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/header_section"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/_150sdp"
         android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="@dimen/_5sdp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/rectangle_menu">
 
-        <Button
-            android:id="@+id/all_wallpapers"
-            android:layout_width="@dimen/_250sdp"
+        <ImageView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_button_background"
-            android:text="@string/all_wallpapers"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14ssp" />
-
-        <Button
-            android:id="@+id/icon_changer"
-            android:layout_width="@dimen/_250sdp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20sdp"
-            android:background="@drawable/rounded_button_background"
-            android:text="@string/icon_changer"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14ssp"
+            android:background="@drawable/wave_pattern_top_menu"
             />
 
-        <Button
-            android:id="@+id/ringtones"
-            android:layout_width="@dimen/_250sdp"
+        <TextView
+            android:id="@+id/launcher_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20sdp"
-            android:background="@drawable/rounded_button_background"
-            android:text="@string/ringtones"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_14ssp" />
+            android:text="@string/s25_ultra_launcher"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="@dimen/_20ssp"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/wave_pattern_bottom_menu"
+            />
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/title_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header_section"
+        android:layout_marginTop="@dimen/_18sdp"
+        android:text="@string/explore_the_features"
+        android:textColor="@color/black"
+        android:alpha="0.7"
+        android:textSize="@dimen/_16ssp"
+        android:layout_marginStart="@dimen/_20ssp"
+        android:textStyle="bold"/>
+
+    <GridLayout
+        android:id="@+id/feature_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_view"
+        android:layout_margin="@dimen/_14sdp"
+        android:columnCount="2"
+        android:rowCount="3"
+        android:alignmentMode="alignMargins"
+        android:padding="@dimen/_6sdp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cat_wallpapers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/wallpapers_button" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/all_wallpapers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/all_wallpapers_button" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/ringtones"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ringtone_button" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/icon_changer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_chnger_button" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/preview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/preview_themes_button" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/rate_us"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardBackgroundColor="@color/white"
+            app:cardElevation="@dimen/_2sdp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/rate_us_button" />
+        </androidx.cardview.widget.CardView>
+    </GridLayout>
+
+</RelativeLayout>

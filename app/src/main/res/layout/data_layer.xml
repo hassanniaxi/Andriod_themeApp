@@ -26,7 +26,7 @@
             android:layout_height="@dimen/_150sdp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/wall_cover" />
+            app:srcCompat="@drawable/colors_cover" />
 
         <TextView
             android:id="@+id/wall_cover_title"

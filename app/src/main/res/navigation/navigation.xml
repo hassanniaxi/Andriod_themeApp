@@ -22,4 +22,10 @@
         android:label="Icon Changer">
     </fragment>
 
+    <fragment
+        android:id="@+id/preview"
+        android:name="com.example.myapplication.preview.Preview"
+        android:label="Preview">
+    </fragment>
+
 </navigation>
